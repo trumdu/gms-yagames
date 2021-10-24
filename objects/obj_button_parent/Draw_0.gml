@@ -1,0 +1,10 @@
+draw_sprite_ext(sprite_index, 0, x, y, 1, 1, 0, color_blend, 1);
+draw_set_halign(fa_center);
+draw_set_valign(fa_center);
+draw_set_font(fnt_normal);
+draw_set_colour(c_black);
+var _w = sprite_width / string_width(text);
+if (_w > 1) _w = 1;
+var _h = sprite_height / string_height(text);
+if (_h > 1) _h = 1;
+draw_text_transformed(x, y, text, _w, _h, 1);
