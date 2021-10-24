@@ -164,3 +164,102 @@ function YaGamesGMS_showRewardedVideo() {
 	}
 	
 }
+
+/**
+ * Перезагрузка страницы браузера
+ */
+function YaGamesGML_pageReload() {
+	if (YaGamesGMS_isDebug) console.log("Page reloaded");
+	window.location.reload(true);
+}
+
+/**
+ * Приоритетный язык браузера
+ * @returns {String} 
+ */
+function YaGamesGML_getBrowserLang() {
+	let brLang = navigator.language || navigator.userLanguage;
+	if (YaGamesGMS_isDebug) console.log("Browser language: " + brLang);
+	return String(brLang);
+}
+
+/**
+ * Язык интерфейса Яндекс.Игр
+ * @returns {String} 
+ */
+function YaGamesGML_getYaGamesOrBrowserLang() {
+	if (YaGamesGMS_isDebug) console.log("Yandex.Game language request");
+
+	if (YaGamesGMS_isInit) {
+	
+		try {
+
+			return window.ysdk.environment.i18n.lang;
+
+		} catch (err) {
+			YaGamesGMS_return_async_event("RuntimeError", "Yandex.Game language error: " + String(err), String(err));
+		}
+
+	}
+	else {
+		YaGamesGMS_return_async_event(YaGamesGMS_notInitDesc, YaGamesGMS_notInitDesc);
+	}
+
+	return YaGamesGML_getBrowserLang();
+}
+
+/**
+ * Копируем текст в буфер обмена
+ * @param {string} ctext 
+ */
+function YaGamesGML_setToClipboard(ctext) {
+
+	if (YaGamesGMS_isDebug) console.log("Clipboard request");
+
+	if (YaGamesGMS_isInit) {
+	
+		try {
+			let text = String(ctext);
+			window.ysdk.clipboard.writeText(text)
+				.then(() => {
+					if (YaGamesGMS_isDebug) console.log("Text copied to clipboard: " + text);
+					YaGamesGMS_return_async_event("ClipboardSuccess", "Clipboard success!");
+				})
+				.catch((err) => {
+					YaGamesGMS_return_async_event("ClipboardError", "Clipboard error: " + String(err), String(err));
+				});
+		} catch (err) {
+			YaGamesGMS_return_async_event("RuntimeError", "Reward runtime error: " + String(err), String(err));
+		}
+
+	}
+	else {
+		YaGamesGMS_return_async_event(YaGamesGMS_notInitDesc, YaGamesGMS_notInitDesc);
+	}	
+
+}
+
+/**
+ * Получаем тип устройства
+ * @returns {String} 
+ */
+function YaGamesGML_getDeviceType() {
+	if (YaGamesGMS_isDebug) console.log("Device type request");
+
+	if (YaGamesGMS_isInit) {
+	
+		try {
+
+			return window.ysdk.deviceInfo.type;
+
+		} catch (err) {
+			YaGamesGMS_return_async_event("RuntimeError", "Device type error: " + String(err), String(err));
+		}
+
+	}
+	else {
+		YaGamesGMS_return_async_event(YaGamesGMS_notInitDesc, YaGamesGMS_notInitDesc);
+	}
+
+	return "undefined";
+}
