@@ -6,7 +6,9 @@ if i_d == msg
 		if ds_map_find_value(async_load, "result") != ""
         {
 			var txt = ds_map_find_value(async_load, "result");
-			YaGames_setToClipboard(txt);
+			var st = YaGames_setToClipboard(txt);
+			var msg = "Clipboard reqId: " + string(st);
+		    log(msg);
         }
     }
 } 

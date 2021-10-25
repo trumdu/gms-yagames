@@ -23,7 +23,7 @@ if (not isMap(async_load)) {
                 // The device has lost its connection to the Internet
             break;
             case "adError":
-                var errorDesc = async_load[? "error"];
+                var errorDesc = async_load[? "value"];
                 // Error displaying ads
             break;
 			// Video Ads
@@ -37,7 +37,7 @@ if (not isMap(async_load)) {
                 // The video ads is closed
             break;
             case "rewardError":
-                var errorDesc = async_load[? "error"];
+                var errorDesc = async_load[? "value"];
                 // Error displaying video ads
             break;
 			// Clipboard
@@ -45,15 +45,41 @@ if (not isMap(async_load)) {
                 // The text was successfully copied to the clipboard
             break;
             case "ClipboardError":
-                var errorDesc = async_load[? "error"];
+                var errorDesc = async_load[? "value"];
                 // Copy error
             break;
-			// All request
+			// Other
+			case "deviceType":
+				// Device Type
+				var msg = "";
+                var value = async_load[? "value"];
+				switch (value) {
+					case YaGames_DeviceDesktop:
+						msg += "Device Desktop";
+						break;
+					case YaGames_DeviceTablet:
+						msg += "Device Tablet";
+						break;
+					case YaGames_DeviceMobile:
+						msg += "Device Mobile";
+						break;
+					case YaGames_DeviceUndefined:
+						msg += "Device Undefined";
+						break;
+					default:
+						msg += "Device check error: " + string(value);
+				}
+			    log(msg);
+			break;
+            case "environment":
+				// Environment information
+                var environment = async_load[? "data"];
+            break;
             case "notInitSDK":
                 // SDK not initialized
             break;
             case "RuntimeError":
-                var errorDesc = async_load[? "error"];
+                var errorDesc = async_load[? "value"];
                 // SDK runtime error
             break;
         }

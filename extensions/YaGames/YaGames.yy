@@ -17,7 +17,7 @@
   "installdir": "",
   "files": [
     {"filename":"YaGames.js","origname":"","init":"","final":"","kind":5,"uncompress":false,"functions":[
-        {"externalName":"YaGamesGMS_getIsInit","kind":5,"help":"YaGames_getIsInit()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getIsInit","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGMS_getInitStatus","kind":5,"help":"YaGames_getInitStatus()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getInitStatus","tags":[],"resourceType":"GMExtensionFunction",},
         {"externalName":"YaGamesGMS_setDebugMode","kind":5,"help":"YaGames_setDebugMode(enable console debugging log?)","hidden":false,"returnType":2,"argCount":0,"args":[
             2,
           ],"resourceVersion":"1.0","name":"YaGames_setDebugMode","tags":[],"resourceType":"GMExtensionFunction",},
@@ -25,24 +25,24 @@
         {"externalName":"YaGamesGMS_showRewardedVideo","kind":5,"help":"YaGames_showRewardedVideo()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_showRewardedVideo","tags":[],"resourceType":"GMExtensionFunction",},
         {"externalName":"YaGamesGML_pageReload","kind":5,"help":"YaGames_pageReload()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_pageReload","tags":[],"resourceType":"GMExtensionFunction",},
         {"externalName":"YaGamesGML_getBrowserLang","kind":5,"help":"YaGames_getBrowserLang()","hidden":false,"returnType":1,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getBrowserLang","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_getYaGamesOrBrowserLang","kind":5,"help":"YaGames_getYandexGameLang()","hidden":false,"returnType":1,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getYandexGameLang","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_setToClipboard","kind":5,"help":"YaGames_setToClipboard(text)","hidden":false,"returnType":1,"argCount":0,"args":[
+        {"externalName":"YaGamesGML_getEnvironment","kind":5,"help":"YaGames_getEnvironment()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getEnvironment","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_setToClipboard","kind":5,"help":"YaGames_setToClipboard(text)","hidden":false,"returnType":2,"argCount":0,"args":[
             1,
           ],"resourceVersion":"1.0","name":"YaGames_setToClipboard","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_getDeviceType","kind":5,"help":"YaGames_getDeviceType()","hidden":false,"returnType":1,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getDeviceType","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_getDeviceType","kind":5,"help":"YaGames_getDeviceType()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getDeviceType","tags":[],"resourceType":"GMExtensionFunction",},
       ],"constants":[
         {"value":"\"mobile\"","hidden":false,"resourceVersion":"1.0","name":"YaGames_DeviceMobile","tags":[],"resourceType":"GMExtensionConstant",},
         {"value":"\"tablet\"","hidden":false,"resourceVersion":"1.0","name":"YaGames_DeviceTablet","tags":[],"resourceType":"GMExtensionConstant",},
         {"value":"\"desktop\"","hidden":false,"resourceVersion":"1.0","name":"YaGames_DeviceDesktop","tags":[],"resourceType":"GMExtensionConstant",},
         {"value":"\"undefined\"","hidden":false,"resourceVersion":"1.0","name":"YaGames_DeviceUndefined","tags":[],"resourceType":"GMExtensionConstant",},
       ],"ProxyFiles":[],"copyToTargets":32,"order":[
-        {"name":"YaGames_getIsInit","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_getInitStatus","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_setDebugMode","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_showFullscreenAdv","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_showRewardedVideo","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_pageReload","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_getBrowserLang","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_getYandexGameLang","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_getEnvironment","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_setToClipboard","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_getDeviceType","path":"extensions/YaGames/YaGames.yy",},
       ],"resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMExtensionFile",},

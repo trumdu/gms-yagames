@@ -1,3 +1,5 @@
 if (clicked) {
-	YaGames_showFullscreenAdv();
+	var st = YaGames_showFullscreenAdv();
+	var msg = "FullScreen Ads reqId: " + string(st);
+    log(msg);
 };

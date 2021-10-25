@@ -34,7 +34,7 @@
     "path": "folders/Objects/Buttons.yy",
   },
   "resourceVersion": "1.0",
-  "name": "obj_button_getYandexLang",
+  "name": "obj_button_getEnvironment",
   "tags": [],
   "resourceType": "GMObject",
 }

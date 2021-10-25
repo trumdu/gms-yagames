@@ -34,7 +34,7 @@
     "path": "folders/Objects/Buttons.yy",
   },
   "resourceVersion": "1.0",
-  "name": "obj_button_showReward",
+  "name": "obj_button_showRewardVideo",
   "tags": [],
   "resourceType": "GMObject",
 }
