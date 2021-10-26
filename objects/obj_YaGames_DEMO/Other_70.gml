@@ -9,6 +9,7 @@ if (not isMap(async_load)) {
         log(msg);
 		
         switch (async_load[? "event"]) {
+			
 			// FullScreen Ads
             case "adShownAndClosed":
                 // Ads displayed successfully
@@ -26,6 +27,7 @@ if (not isMap(async_load)) {
                 var errorDesc = async_load[? "value"];
                 // Error displaying ads
             break;
+			
 			// Video Ads
             case "rewardOpened":
                 // Video advertising is open
@@ -40,14 +42,58 @@ if (not isMap(async_load)) {
                 var errorDesc = async_load[? "value"];
                 // Error displaying video ads
             break;
+			
 			// Clipboard
-            case "ClipboardSuccess":
+            case "clipboardSuccess":
                 // The text was successfully copied to the clipboard
             break;
-            case "ClipboardError":
+            case "clipboardError":
                 var errorDesc = async_load[? "value"];
                 // Copy error
             break;
+			
+			// Leaderboards
+			case "leaderboardsInitError":
+				// Leaderboards init error
+                var errorDesc = async_load[? "value"];
+			break;
+			case "leaderboardsRequest":
+				// Leaderboard data
+                var data = async_load[? "data"];
+			break;
+			case "leaderboardsRequestError":
+				// Leaderboard data
+                var errorDesc = async_load[? "value"];
+			break;
+			case "leaderboardsPlayerEntry":
+				// Leaderboard PlayerEntry data
+                var data = async_load[? "data"];
+			break;
+			case "leaderboardsPlayerEntryError":
+				// Leaderboard PlayerEntry data
+                var errorDesc = async_load[? "value"];
+			break;
+			case "leaderboardsPlayerNotPresent":
+				// Leaderboard PlayerEntry error
+                var errorDesc = async_load[? "value"];
+			break;
+			case "leaderboardsEntries":
+				// Leaderboard Entries data
+                var data = async_load[? "data"];
+			break;
+			case "leaderboardsEntriesError":
+				// Leaderboard Entries error
+                var errorDesc = async_load[? "value"];
+			break;
+			case "leaderboardsSetScore":
+				// Leaderboard SetScore data
+                var data = async_load[? "data"];
+			break;
+			case "leaderboardsSetScoreError":
+				// Leaderboard SetScore error
+                var errorDesc = async_load[? "value"];
+			break;
+			
 			// Other
 			case "deviceType":
 				// Device Type
