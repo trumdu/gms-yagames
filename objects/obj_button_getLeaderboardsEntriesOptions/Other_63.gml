@@ -6,8 +6,8 @@ if i_d == msg
 		if ds_map_find_value(async_load, "result") != ""
         {
 			var txt = ds_map_find_value(async_load, "result");
-			var st = YaGames_getLeaderboardsEntriesOptions(txt, YaGames_AvatarSizeMedium, YaGames_AvatarSizeSmall, 0, 3, 3);
-			var msg = "Leaderboards Entries Options reqId: " + string(st);
+			req_id = YaGames_Leaderboards_getEntriesOptions(txt, YaGames_AvatarSizeLarge, YaGames_AvatarSizeSmall, 1, 3, 4);
+			var msg = "Leaderboards Entries Options reqId: " + string(req_id);
 		    log(msg);
         }
     }

@@ -1,5 +1,5 @@
-if (clicked) {
-	var st = YaGames_getDeviceType();
-	var msg = "DeviceType reqId: " + string(st);
+if (is_clicked) {
+	req_id = YaGames_getDeviceType();
+	var msg = "DeviceType reqId: " + string(req_id);
     log(msg);
 };

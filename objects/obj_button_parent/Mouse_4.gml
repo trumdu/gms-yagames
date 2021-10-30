@@ -1,2 +1,3 @@
-clicked = true;
-color_blend = c_yellow;
+if (!is_disabled) {
+	is_clicked = true;
+}

@@ -1,3 +1,3 @@
 event_inherited();
-text += @"Show 
-Video Ads";
+text += @"Video
+Ads";

@@ -11,8 +11,6 @@
 
 var YaGamesGMS = {
 	_mapTypeDesc: "YaGames",
-	_notInitEvent: "notInitSDK",
-	_notInitDesc: "SDK not Inited",
 	_allowConsoleDebug: false,
 	_request_id: 0,
 	_ysdk: null,
@@ -30,8 +28,35 @@ var YaGamesGMS = {
 		}
 	},
 
-	browserConsoleLog: function (message, request_id) {
-		if (YaGamesGMS._allowConsoleDebug) {
+	stringifyObject: function (obj) {
+		try {
+			return JSON.stringify(obj);
+		} catch (e) {
+			return null;
+		}
+	},
+
+	browserConsoleLog: function (message, request_id, data) {
+		let self = YaGamesGMS;
+		if (self._allowConsoleDebug) {
+			if (data) {
+				if (data instanceof Error) {
+					message += " | " + self.toErrStr(data);
+				}
+				else {
+					switch (typeof data) {
+						case "undefined":
+							// empty
+							break;
+						case "object":
+							message += " | " + self.stringifyObject(data);
+							break;
+						default:
+							message += " | " + data;
+					}
+				}
+			}
+
 			if (request_id >= 0) {
 				console.log("Request " + request_id + ": " + message);
 			}
@@ -78,6 +103,36 @@ var YaGamesGMS = {
 
 	},
 
+	sendError: function (request_id, event, err) {
+		setTimeout(() => {
+			let self = YaGamesGMS;
+
+			let map = {};
+			if ("code" in err) map["code"] = err.code + "";
+			if ("name" in err) map["name"] = err.name + "";
+			if ("message" in err) {
+				map["message"] = err.message + "";
+			}
+			else {
+				map["message"] = self.toErrStr(err);
+			}
+
+			YaGamesGMS.send(request_id, event, map);
+		}, 0);
+	},
+
+	sendSdkNotInitStatus: function (request_id) {
+		let self = YaGamesGMS;
+		self.browserConsoleLog( "notInitSDK", request_id, "SDK not Initialized");
+		self.send(request_id, "notInitSDK", "SDK not Initialized");
+	},
+
+	sendLeaderboardNotInitStatus: function (request_id) {
+		let self = YaGamesGMS;
+		self.browserConsoleLog( "notLeaderboardInitSDK", request_id, "Leaderboard not Initialized");
+		self.send(request_id, "notLeaderboardInitSDK", "Leaderboard not Initialized");
+	},
+
 	delaySend: function (request_id, event, message) {
 		setTimeout(() => {
 			YaGamesGMS.send(request_id, event, message);
@@ -86,15 +141,11 @@ var YaGamesGMS = {
 
 	getInitStatus: function () {
 		return YaGamesGMS._ysdk !== null;
-	}
-}
+	},
 
-/**
- * Reloading the browser page
- */
-function YaGamesGML_pageReload() {
-	YaGamesGMS.browserConsoleLog( "Reloading the browser page");
-	window.location.reload(true);
+	getLeaderboardInitStatus: function () {
+		return YaGamesGMS._lb !== null;
+	}
 }
 
 /**
@@ -122,6 +173,7 @@ function YaGamesGMS_setDebugMode(debugStatus) {
 		console.log("Browser debug mode disabled");
 		self._allowConsoleDebug = false;
 	}
+	return (self._allowConsoleDebug ? 1 : 0);
 }
 
 /**
@@ -131,11 +183,11 @@ function YaGamesGMS_setDebugMode(debugStatus) {
 function YaGamesGMS_getInitStatus() {
 	let self = YaGamesGMS;
 	if (self.getInitStatus()) {
-		self.browserConsoleLog("SDK is Inited");
+		self.browserConsoleLog("SDK is Initiated");
 		return 1;
 	}
 	else {
-		self.browserConsoleLog("SDK not Inited");
+		self.browserConsoleLog("SDK not Initiated");
 		return 0;
 	}
 }
@@ -151,53 +203,49 @@ function YaGamesGML_getBrowserLang() {
 }
 
 /**
- * Get the device type
- * @returns {Number} Request_id
+ * Reloading the browser page
  */
-function YaGamesGML_getDeviceType() {
-	let self = YaGamesGMS;
-	let req_id = self.newRequest();
-	setTimeout(function run() {
-		self.browserConsoleLog( "Device type request", req_id);
-		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
-		}
-		else {
-			try {
-				let dev_type = self._ysdk.deviceInfo.type;
-				self.send(req_id, "deviceType", dev_type);
-				self.browserConsoleLog( "Device type: " + dev_type, req_id);
-			} catch (err) {
-				let err_txt = self.toErrStr(err);
-				self.delaySend(req_id, "RuntimeError", err_txt);
-				self.browserConsoleLog( "Device type runtime error: " + err_txt, req_id);
-			}
-		}
-	}, 0);
-	return req_id;
+function YaGamesGML_pageReload() {
+	YaGamesGMS.browserConsoleLog( "Reloading the browser page");
+	window.location.reload(true);
 }
 
 /**
- * Yandex.Game Environment
+ * Text output to browser console
+ * @param {string} ctext
+ */
+function YaGamesGML_browserConsoleLog(ctext) {
+	console.log(ctext + "");
+}
+
+/**
+ * Copying the text to the clipboard
+ * @param {string} ctext
  * @returns {Number} Request_id
  */
-function YaGamesGML_getEnvironment() {
+function YaGamesGML_setToClipboard(ctext) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Environment request", req_id);
+		self.browserConsoleLog( "Clipboard request", req_id);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
 			try {
-				let envDt = self._ysdk.environment;
-				self.send(req_id, "environment", envDt);
-				self.browserConsoleLog( "Environment: " + envDt, req_id);
+				let text = ctext + "";
+				self._ysdk.clipboard.writeText(text)
+					.then(() => {
+						self.browserConsoleLog( "Text copied to clipboard", req_id, text);
+						self.send(req_id, "clipboardSuccess");
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "Failed FullScreen Ads show", req_id, err);
+						self.sendError(req_id, "clipboardError", err)
+					});
 			} catch (err) {
-				let err_txt = self.toErrStr(err);
-				self.delaySend(req_id, "RuntimeError", err_txt);
-				self.browserConsoleLog( "Environment runtime error: " + err_txt, req_id);
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
 			}
 		}
 	}, 0);
@@ -214,7 +262,7 @@ function YaGamesGMS_showFullscreenAdv() {
 	setTimeout(function run() {
 		self.browserConsoleLog( "FullScreen Ads requested", req_id);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
 			try {
@@ -223,28 +271,26 @@ function YaGamesGMS_showFullscreenAdv() {
 						onClose: (wasShown) => {
 							let map = {};
 							map["wasShown"] = wasShown;
+							self.browserConsoleLog( "FullScreen Ads closed", req_id, map);
 							self.send(req_id, "adClosed", map);
-							self.browserConsoleLog( "FullScreen Ads closed. Was shown: " + wasShown, req_id);
 						},
 						onOpen: () => {
+							self.browserConsoleLog( "FullScreen Ads opened", req_id);
 							self.send(req_id, "adOpened");
-							self.browserConsoleLog( "FullScreen Ads opened.", req_id);
 						},
 						onOffline: () => {
+							self.browserConsoleLog( "FullScreen Ads. Offline mode", req_id);
 							self.send(req_id, "offlineMode");
-							self.browserConsoleLog( "FullScreen Ads. Offline mode.", req_id);
 						},
 						onError: (err) => {
-							let err_txt = self.toErrStr(err);
-							self.send(req_id, "adError", err_txt);
-							self.browserConsoleLog( "Failed FullScreen Ads show: " + err_txt, req_id);
+							self.browserConsoleLog( "Failed FullScreen Ads show", req_id, err);
+							self.sendError(req_id, "adError", err);
 						},
 					},
 				});
 			} catch (err) {
-				let err_txt = self.toErrStr(err);
-				self.delaySend(req_id, "RuntimeError", err_txt);
-				self.browserConsoleLog( "FullScreen Ads runtime error: " + err_txt, req_id);
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
 			}
 		}
 	}, 0);
@@ -261,35 +307,33 @@ function YaGamesGMS_showRewardedVideo() {
 	setTimeout(function run() {
 		self.browserConsoleLog( "FullScreen ad requested", req_id);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
 			try {
 				self._ysdk.adv.showRewardedVideo({
 					callbacks: {
 						onOpen: () => {
-							self.send(req_id, "rewardOpened");
 							self.browserConsoleLog( "Reward ad opened.", req_id);
+							self.send(req_id, "rewardOpened");
 						},
 						onRewarded: () => {
-							self.send(req_id, "rewardReceived");
 							self.browserConsoleLog( "Rewarded!", req_id);
+							self.send(req_id, "rewardReceived");
 						},
 						onClose: () => {
-							self.send(req_id, "rewardClosed");
 							self.browserConsoleLog( "Reward ad closed.", req_id);
+							self.send(req_id, "rewardClosed");
 						},
 						onError: (err) => {
-							let err_txt = self.toErrStr(err);
-							self.send(req_id, "rewardError", err_txt);
-							self.browserConsoleLog( "Reward ad show failed: " + + err_txt, req_id);
+							self.browserConsoleLog( "Reward ad show failed", req_id, err);
+							self.sendError(req_id, "rewardError", err);
 						},
 					},
 				});
 			} catch (err) {
-				let err_txt = self.toErrStr(err);
-				self.delaySend(req_id, "RuntimeError", err_txt);
-				self.browserConsoleLog( "Reward runtime error: " + err_txt, req_id);
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
 			}
 		}
 	}, 0);
@@ -297,35 +341,51 @@ function YaGamesGMS_showRewardedVideo() {
 }
 
 /**
- * Copying the text to the clipboard
- * @param {string} ctext
+ * Get the device type
  * @returns {Number} Request_id
  */
-function YaGamesGML_setToClipboard(ctext) {
+function YaGamesGML_DeviceInfo_getType() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Clipboard request", req_id);
+		self.browserConsoleLog( "Device type request", req_id);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
 			try {
-				let text = ctext + "";
-				self._ysdk.clipboard.writeText(text)
-					.then(() => {
-						self.send(req_id, "clipboardSuccess");
-						self.browserConsoleLog( "Text copied to clipboard: " + text, req_id);
-					})
-					.catch((err) => {
-						let err_txt = self.toErrStr(err);
-						self.send(req_id, "clipboardError", err_txt);
-						self.browserConsoleLog( "Clipboard error: " + err_txt, req_id);
-					});
+				let dev_type = self._ysdk.deviceInfo.type;
+				self.browserConsoleLog( "Device type", req_id, dev_type);
+				self.send(req_id, "deviceType", dev_type);
 			} catch (err) {
-				let err_txt = self.toErrStr(err);
-				self.delaySend(req_id, "RuntimeError", err_txt);
-				self.browserConsoleLog( "Clipboard runtime error: " + err_txt, req_id);
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err);
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Yandex.Game Environment
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_getEnvironment() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Environment request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				let envDt = self._ysdk.environment;
+				self.browserConsoleLog( "Environment", req_id, envDt);
+				self.send(req_id, "environment", envDt);
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err);
 			}
 		}
 	}, 0);
@@ -334,33 +394,41 @@ function YaGamesGML_setToClipboard(ctext) {
 
 /**
  * Leaderboard object Initialization
- * @param request_id
- * @returns {boolean}
+ * @returns {Number} Request_id
  */
-function YaGamesGML_Leaderboards_init(request_id) {
+function YaGamesGML_Leaderboards_Init() {
 	let self = YaGamesGMS;
-	if (self._lb === null) {
-		try {
-			self._ysdk.getLeaderboards()
-				.then((lb) => {
-					self._lb = lb;
-					return true;
-				})
-				.catch((err) => {
-					let err_txt = self.toErrStr(err);
-					self.send(request_id, "leaderboardsInitError", err_txt);
-					self.browserConsoleLog( "Leaderboards init failed: " + + err_txt, request_id);
-				});
-		} catch (err) {
-			let err_txt = self.toErrStr(err);
-			self.delaySend(request_id, "RuntimeError", err_txt);
-			self.browserConsoleLog( "Leaderboard init runtime error: " + err_txt, request_id);
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Leaderboard init requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
 		}
-		return false;
-	}
-	else {
-		return true;
-	}
+		else {
+			if (self.getLeaderboardInitStatus()) {
+				self.browserConsoleLog( "Leaderboard was initialized", req_id);
+				self.send(req_id, "leaderboardsInit");
+			}
+			else {
+				try {
+					self._ysdk.getLeaderboards()
+						.then((lb) => {
+							self._lb = lb;
+							self.browserConsoleLog( "Leaderboard was initialized", req_id);
+							self.send(req_id, "leaderboardsInit");
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Leaderboards init error", req_id, err);
+							self.sendError(req_id, "leaderboardsInitError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err)
+				}
+			}
+		}
+	}, 0);
+	return req_id;
 }
 
 /**
@@ -373,27 +441,28 @@ function YaGamesGML_Leaderboards_getByDescription(cleaderboard_name) {
 	let req_id = self.newRequest();
 	setTimeout(function run() {
 		let leaderboard_name = cleaderboard_name + "";
-		self.browserConsoleLog( "Leaderboard " + leaderboard_name + " requested", req_id);
+		self.browserConsoleLog( "Leaderboard requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
-			if (YaGamesGML_Leaderboards_init(req_id)) {
+			if (!self.getLeaderboardInitStatus()) {
+				self.sendLeaderboardNotInitStatus(req_id);
+			}
+			else {
 				try {
 					self._lb.getLeaderboardDescription(leaderboard_name)
 						.then((result) => {
+							self.browserConsoleLog( "Leaderboards requested.", req_id, result);
 							self.send(req_id, "leaderboardsRequest", result);
-							self.browserConsoleLog( "Leaderboards requested.", req_id);
 						})
 						.catch((err) => {
-							let err_txt = self.toErrStr(err);
-							self.send(req_id, "leaderboardsRequestError", err_txt);
-							self.browserConsoleLog( "Leaderboard " + leaderboard_name + " requested failed: " + + err_txt, req_id);
+							self.browserConsoleLog( "Leaderboard requested failed: ", req_id, err);
+							self.sendError(req_id, "leaderboardsRequestError", err);
 						});
 				} catch (err) {
-					let err_txt = self.toErrStr(err);
-					self.delaySend(req_id, "RuntimeError", err_txt);
-					self.browserConsoleLog( "Leaderboard " + leaderboard_name + " requested runtime error: " + err_txt, req_id);
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
 				}
 			}
 		}
@@ -417,40 +486,39 @@ function YaGamesGML_Leaderboards_getPlayerEntry(
 	let req_id = self.newRequest();
 	setTimeout(function run() {
 		let leaderboard_name = cleaderboard_name + "";
-		self.browserConsoleLog( "Leaderboard " + leaderboard_name + " PlayerEntry requested", req_id);
+		self.browserConsoleLog( "Leaderboard PlayerEntry requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
-			if (YaGamesGML_Leaderboards_init(req_id)) {
+			if (!self.getLeaderboardInitStatus()) {
+				self.sendLeaderboardNotInitStatus(req_id);
+			}
+			else {
 				try {
 					self._lb
 						.getLeaderboardPlayerEntry(leaderboard_name)
 						.then((result) => {
-							let avatarSrcSize = cavatarSrcSize + "";
-							let avatarSrcSetSize = cavatarSrcSetSize + "";
-							if (avatarSrcSize && result.player) {
-								result.player.getAvatarSrc = result.player.getAvatarSrc(avatarSrcSize);
+							if (cavatarSrcSize && result.player) {
+								result.player.getAvatarSrc = result.player.getAvatarSrc(cavatarSrcSize + "");
 							}
-							if (avatarSrcSetSize && result.player) {
-								result.player.getAvatarSrcSet = result.player.getAvatarSrcSet(avatarSrcSetSize);
+							if (cavatarSrcSetSize && result.player) {
+								result.player.getAvatarSrcSet = result.player.getAvatarSrcSet(cavatarSrcSetSize + "");
 							}
+							self.browserConsoleLog("Leaderboards PlayerEntry loaded: " + result, req_id, result);
 							self.send(req_id, "leaderboardsPlayerEntry", result);
-							self.browserConsoleLog("Leaderboards PlayerEntry loaded: " + result, req_id);
 						})
 						.catch((err) => {
-							let err_txt = self.toErrStr(err);
+							self.browserConsoleLog("Leaderboards PlayerEntry failed", req_id, err);
 							if (err.code === 'LEADERBOARD_PLAYER_NOT_PRESENT') {
-								self.send(req_id, "leaderboardsPlayerNotPresent", err_txt);
+								self.sendError(req_id, "leaderboardsPlayerNotPresent", err);
 							} else {
-								self.send(req_id, "leaderboardsPlayerEntryError", err_txt);
+								self.sendError(req_id, "leaderboardsPlayerEntryError", err);
 							}
-							self.browserConsoleLog("Leaderboards PlayerEntry failed: " + err_txt, req_id);
 						});
 				} catch (err) {
-					let err_txt = self.toErrStr(err);
-					self.delaySend(req_id, "RuntimeError", err_txt);
-					self.browserConsoleLog("Leaderboard " + leaderboard_name + " PlayerEntry runtime error: " + err_txt, req_id);
+					self.browserConsoleLog("Leaderboard PlayerEntry runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
 				}
 			}
 		}
@@ -468,76 +536,62 @@ function YaGamesGML_Leaderboards_getPlayerEntry(
  * @param cquantityTop The number of records from the top of the table. The minimum value is 1, the maximum is 20.
  * @returns {Number} Request_id
  */
-function YaGamesGML_Leaderboards_getEntries_options(
+function YaGamesGML_Leaderboards_getEntries(
 	cleaderboard_name,
 	cavatarSrcSize,
 	cavatarSrcSetSize,
-	cincludeUser = 0,
-	cquantityAround = 5,
-	cquantityTop = 5
+	cincludeUser,
+	cquantityAround,
+	cquantityTop
 ){
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
 		let leaderboard_name = cleaderboard_name + "";
-		self.browserConsoleLog( "Leaderboard " + leaderboard_name + " Entries requested", req_id);
+		self.browserConsoleLog( "Leaderboard Entries requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
-			if (YaGamesGML_Leaderboards_init(req_id)) {
+			if (!self.getLeaderboardInitStatus()) {
+				self.sendLeaderboardNotInitStatus(req_id);
+			}
+			else {
 				try {
-					let includeUser = cincludeUser > 0;
-					let quantityAround = (cquantityAround < 1) ? 1 : ((cquantityAround > 10) ? 10 : cquantityAround);
-					let quantityTop = (cquantityTop < 1) ? 1 : ((cquantityTop > 20) ? 20 : cquantityTop);
+					let options = {};
+					if (cincludeUser) options.includeUser = cincludeUser > 0;
+					if (cquantityAround) options.quantityAround = (cquantityAround < 1) ? 1 : ((cquantityAround > 10) ? 10 : cquantityAround);
+					if (cquantityTop) options.quantityTop = (cquantityTop < 1) ? 1 : ((cquantityTop > 20) ? 20 : cquantityTop);
+
 					self._lb
-						.getLeaderboardEntries(leaderboard_name, includeUser, quantityAround, quantityTop)
+						.getLeaderboardEntries(leaderboard_name, options)
 						.then((result) => {
-							let avatarSrcSize = cavatarSrcSize + "";
-							let avatarSrcSetSize = cavatarSrcSetSize + "";
 							if (result.entries) {
 								for (let i = 0; i < result.entries.length; i++) {
 									let entry = result.entries[i];
-									if (avatarSrcSize) {
-										entry.player.getAvatarSrc = entry.player.getAvatarSrc(avatarSrcSize);
+									if (cavatarSrcSize) {
+										entry.player.getAvatarSrc = entry.player.getAvatarSrc(cavatarSrcSize + "");
 									}
-									if (avatarSrcSetSize) {
-										entry.player.getAvatarSrcSet = entry.player.getAvatarSrcSet(avatarSrcSetSize);
+									if (cavatarSrcSetSize) {
+										entry.player.getAvatarSrcSet = entry.player.getAvatarSrcSet(cavatarSrcSetSize + "");
 									}
 								}
 							}
+							self.browserConsoleLog("Leaderboards Entries loaded", req_id, result);
 							self.send(req_id, "leaderboardsEntries", result);
-							self.browserConsoleLog("Leaderboards Entries loaded: " + result, req_id);
 						})
 						.catch((err) => {
-							let err_txt = self.toErrStr(err);
-							self.send(req_id, "leaderboardsEntriesError", err_txt);
-							self.browserConsoleLog("Leaderboards Entries failed: " + err_txt, req_id);
+							self.browserConsoleLog("Leaderboards Entries failed", req_id, err);
+							self.sendError(req_id, "leaderboardsEntriesError", err);
 						});
 				} catch (err) {
-					let err_txt = self.toErrStr(err);
-					self.delaySend(req_id, "RuntimeError", err_txt);
-					self.browserConsoleLog("Leaderboard " + leaderboard_name + " Entries runtime error: " + err_txt, req_id);
+					self.browserConsoleLog("Leaderboard Entries runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
 				}
 			}
 		}
 	}, 0);
 	return req_id;
-}
-
-/**
- * Get the rating of multiple users
- * @param cleaderboard_name
- * @param cavatarSrcSize User portrait URL. Possible size values are small, medium, and large.
- * @param cavatarSrcSetSize Srcset of a user portrait that is suitable for Retina displays. Possible values for size: small, medium and large
- * @returns {Number} Request_id
- */
-function YaGamesGML_Leaderboards_getEntries(
-	cleaderboard_name,
-	cavatarSrcSize,
-	cavatarSrcSetSize
-){
-	return YaGamesGML_Leaderboards_getEntries_options(cleaderboard_name, cavatarSrcSize, cavatarSrcSetSize);
 }
 
 /**
@@ -547,53 +601,43 @@ function YaGamesGML_Leaderboards_getEntries(
  * @param cextra_data User description.
  * @returns {Number} Request_id
  */
-function YaGamesGML_Leaderboards_setScore_extraData(cleaderboard_name, cscore, cextra_data = "") {
+function YaGamesGML_Leaderboards_setScore(cleaderboard_name, cscore, cextra_data) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
 		let leaderboard_name = cleaderboard_name + "";
-		self.browserConsoleLog( "Leaderboard " + leaderboard_name + " SetScore requested", req_id);
+		self.browserConsoleLog( "Leaderboard SetScore requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
-			self.send(req_id, self._notInitEvent, self._notInitDesc);
+			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
-			if (YaGamesGML_Leaderboards_init(req_id)) {
+			if (!self.getLeaderboardInitStatus()) {
+				self.sendLeaderboardNotInitStatus(req_id);
+			}
+			else {
 				try {
 					let promise;
-					let extra_data = cextra_data + "";
 					let score = +cscore;
-					if (extra_data.length > 0) {
-						promise = self._lb.setLeaderboardScore(leaderboard_name, score, extra_data);
+					if (cextra_data) {
+						promise = self._lb.setLeaderboardScore(leaderboard_name, score, cextra_data + "");
 					} else {
 						promise = self._lb.setLeaderboardScore(leaderboard_name, score);
 					}
 					promise
 						.then((result) => {
+							self.browserConsoleLog( "Leaderboards SetScore success.", req_id, result);
 							self.send(req_id, "leaderboardsSetScore", result);
-							self.browserConsoleLog( "Leaderboards SetScore success.", req_id);
 						})
 						.catch((err) => {
-							let err_txt = self.toErrStr(err);
-							self.send(req_id, "leaderboardsSetScoreError", err_txt);
-							self.browserConsoleLog( "Leaderboard " + leaderboard_name + " SetScore failed: " + + err_txt, req_id);
+							self.browserConsoleLog( "Leaderboard SetScore failed", req_id, err);
+							self.sendError(req_id, "leaderboardsSetScoreError", err);
 						});
 				} catch (err) {
-					let err_txt = self.toErrStr(err);
-					self.delaySend(req_id, "RuntimeError", err_txt);
-					self.browserConsoleLog( "Leaderboard " + leaderboard_name + " SetScore runtime error: " + err_txt, req_id);
+					self.browserConsoleLog( "Leaderboard SetScore runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
 				}
 			}
 		}
 	}, 0);
 	return req_id;
-}
-
-/**
- * Add new result to Leaderboard
- * @param cleaderboard_name
- * @param cscore The value of the result. It cannot be negative. If the table type is time, then the values must be transmitted in milliseconds.
- * @returns {Number} Request_id
- */
-function YaGamesGML_Leaderboards_setScore(cleaderboard_name, cscore){
-	return YaGamesGML_Leaderboards_setScore_extraData(cleaderboard_name, cscore);
 }

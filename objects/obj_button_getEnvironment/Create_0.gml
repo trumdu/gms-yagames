@@ -1,2 +1,2 @@
 event_inherited();
-text += @"Environment";
+text += @"Get Environment";

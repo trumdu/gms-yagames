@@ -1,5 +1,5 @@
-if (clicked) {
-	var st = YaGames_getEnvironment();
-	var msg = "Environment reqId: " + string(st);
+if (is_clicked) {
+	req_id = YaGames_getEnvironment();
+	var msg = "Environment reqId: " + string(req_id);
     log(msg);
 };

@@ -1,4 +1,4 @@
 event_inherited();
 text += @"Get
-Leaderboard";
+Desc.";
 msg = -1;

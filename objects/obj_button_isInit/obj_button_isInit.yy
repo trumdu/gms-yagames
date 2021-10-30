@@ -1,7 +1,7 @@
 {
   "spriteId": {
-    "name": "spr_button",
-    "path": "sprites/spr_button/spr_button.yy",
+    "name": "spr_button_short",
+    "path": "sprites/spr_button_short/spr_button_short.yy",
   },
   "solid": false,
   "visible": true,
@@ -30,8 +30,8 @@
   "properties": [],
   "overriddenProperties": [],
   "parent": {
-    "name": "Buttons",
-    "path": "folders/Objects/Buttons.yy",
+    "name": "General",
+    "path": "folders/Objects/Buttons/General.yy",
   },
   "resourceVersion": "1.0",
   "name": "obj_button_isInit",

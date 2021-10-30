@@ -1,2 +1,1 @@
-clicked = false;
-color_blend = c_white;
+is_clicked = false;

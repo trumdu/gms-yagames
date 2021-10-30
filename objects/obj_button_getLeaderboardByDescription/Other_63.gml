@@ -6,8 +6,8 @@ if i_d == msg
 		if ds_map_find_value(async_load, "result") != ""
         {
 			var txt = ds_map_find_value(async_load, "result");
-			var st = YaGames_getLeaderboard(txt);
-			var msg = "Leaderboard reqId: " + string(st);
+			req_id = YaGames_Leaderboards_getByDescription(txt);
+			var msg = "Leaderboard get by Description reqId: " + string(req_id);
 		    log(msg);
         }
     }

@@ -1,4 +1,4 @@
 event_inherited();
-text += @"Get Leaderboard
-Entries Options";
+text += @"Get Entries
+Custom options";
 msg = -1;

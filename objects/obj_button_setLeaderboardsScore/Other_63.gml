@@ -6,8 +6,8 @@ if i_d == msg
 		if ds_map_find_value(async_load, "result") != ""
         {
 			var txt = ds_map_find_value(async_load, "result");
-			var st = YaGames_setLeaderboardsScore(txt, 1);
-			var msg = "Leaderboards set Score reqId: " + string(st);
+			req_id = YaGames_Leaderboards_setScore(txt, score_to_set)
+			var msg = "Leaderboard Set Score reqId: " + string(req_id);
 		    log(msg);
         }
     }

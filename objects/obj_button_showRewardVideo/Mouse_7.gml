@@ -1,5 +1,5 @@
-if (clicked) {
-	var st = YaGames_showRewardedVideo();
-	var msg = "Rewarded Video reqId: " + string(st);
+if (is_clicked) {
+	req_id = YaGames_showRewardedVideo();
+	var msg = "Rewarded Video reqId: " + string(req_id);
     log(msg);
 };

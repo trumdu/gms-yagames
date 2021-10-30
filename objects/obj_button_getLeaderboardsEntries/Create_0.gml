@@ -1,4 +1,4 @@
 event_inherited();
 text += @"Get
-Leaderboard Entries";
+Entries";
 msg = -1;

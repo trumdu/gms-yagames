@@ -3,7 +3,7 @@
   "options": [],
   "exportToGame": true,
   "supportedTargets": -1,
-  "extensionVersion": "1.0.0",
+  "extensionVersion": "1.0.1",
   "packageId": "",
   "productId": "",
   "author": "",
@@ -29,37 +29,47 @@
         {"externalName":"YaGamesGML_setToClipboard","kind":5,"help":"YaGames_setToClipboard(text)","hidden":false,"returnType":2,"argCount":0,"args":[
             1,
           ],"resourceVersion":"1.0","name":"YaGames_setToClipboard","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_getDeviceType","kind":5,"help":"YaGames_getDeviceType()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getDeviceType","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_Leaderboards_getByDescription","kind":5,"help":"YaGames_getLeaderboard(leaderboard_name)","hidden":false,"returnType":2,"argCount":0,"args":[
+        {"externalName":"YaGamesGML_DeviceInfo_getType","kind":5,"help":"YaGames_getDeviceType()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_getDeviceType","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_getByDescription","kind":5,"help":"YaGames_Leaderboards_getByDescription(leaderboard_name)","hidden":false,"returnType":2,"argCount":0,"args":[
             1,
-          ],"resourceVersion":"1.0","name":"YaGames_getLeaderboard","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_Leaderboards_getPlayerEntry","kind":5,"help":"YaGames_getLeaderboardsPlayerEntry(leaderboard_name, avatarSrcSize, avatarSrcSetSize)","hidden":false,"returnType":2,"argCount":0,"args":[
-            1,
-            1,
-            1,
-          ],"resourceVersion":"1.0","name":"YaGames_getLeaderboardsPlayerEntry","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_Leaderboards_getEntries","kind":5,"help":"YaGames_getLeaderboardsEntries(leaderboard_name, avatarSrcSize, avatarSrcSetSize)","hidden":false,"returnType":2,"argCount":0,"args":[
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_getByDescription","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_getPlayerEntry","kind":5,"help":"YaGames_Leaderboards_getPlayerEntryAvatar(leaderboard_name, avatarSrcSize, avatarSrcSetSize)","hidden":false,"returnType":2,"argCount":0,"args":[
             1,
             1,
             1,
-          ],"resourceVersion":"1.0","name":"YaGames_getLeaderboardsEntries","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_Leaderboards_getEntries_options","kind":5,"help":"YaGames_getLeaderboardsEntriesOptions(leaderboard_name, avatarSrcSize, avatarSrcSetSize, includeUser, quantityAround, quantityTop)","hidden":false,"returnType":2,"argCount":0,"args":[
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_getPlayerEntryAvatar","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_getEntries","kind":5,"help":"YaGames_Leaderboards_getEntriesAvatar(leaderboard_name, avatarSrcSize, avatarSrcSetSize)","hidden":false,"returnType":2,"argCount":0,"args":[
             1,
             1,
             1,
-            2,
-            2,
-            2,
-          ],"resourceVersion":"1.0","name":"YaGames_getLeaderboardsEntriesOptions","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_Leaderboards_setScore","kind":5,"help":"YaGames_setLeaderboardsScore(leaderboard_name, score)","hidden":false,"returnType":2,"argCount":0,"args":[
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_getEntriesAvatar","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_getEntries","kind":5,"help":"YaGames_Leaderboards_getEntriesOptions(leaderboard_name, avatarSrcSize, avatarSrcSetSize, includeUser, quantityAround, quantityTop)","hidden":false,"returnType":2,"argCount":0,"args":[
+            1,
+            1,
             1,
             2,
-          ],"resourceVersion":"1.0","name":"YaGames_setLeaderboardsScore","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"YaGamesGML_Leaderboards_setScore_extraData","kind":5,"help":"YaGames_setLeaderboardsScore(leaderboard_name, score, extra_data)","hidden":false,"returnType":2,"argCount":0,"args":[
+            2,
+            2,
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_getEntriesOptions","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_setScore","kind":5,"help":"YaGames_Leaderboards_setScore(leaderboard_name, score)","hidden":false,"returnType":2,"argCount":0,"args":[
+            1,
+            2,
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_setScore","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_setScore","kind":5,"help":"YaGames_Leaderboards_setScore(leaderboard_name, score, extra_data)","hidden":false,"returnType":2,"argCount":0,"args":[
             1,
             2,
             1,
-          ],"resourceVersion":"1.0","name":"YaGames_setLeaderboardsScoreExtraData","tags":[],"resourceType":"GMExtensionFunction",},
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_setScoreExtraData","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_browserConsoleLog","kind":5,"help":"YaGames_browserConsoleLog(str)","hidden":false,"returnType":2,"argCount":0,"args":[
+            1,
+          ],"resourceVersion":"1.0","name":"YaGames_browserConsoleLog","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_Init","kind":5,"help":"YaGames_Leaderboards_Init()","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"YaGames_Leaderboards_Init","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_getPlayerEntry","kind":5,"help":"YaGames_Leaderboards_getPlayerEntry(leaderboard_name)","hidden":false,"returnType":2,"argCount":0,"args":[
+            1,
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_getPlayerEntry","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"YaGamesGML_Leaderboards_getEntries","kind":5,"help":"YaGames_Leaderboards_getEntries(leaderboard_name)","hidden":false,"returnType":2,"argCount":0,"args":[
+            1,
+          ],"resourceVersion":"1.0","name":"YaGames_Leaderboards_getEntries","tags":[],"resourceType":"GMExtensionFunction",},
       ],"constants":[
         {"value":"\"mobile\"","hidden":false,"resourceVersion":"1.0","name":"YaGames_DeviceMobile","tags":[],"resourceType":"GMExtensionConstant",},
         {"value":"\"tablet\"","hidden":false,"resourceVersion":"1.0","name":"YaGames_DeviceTablet","tags":[],"resourceType":"GMExtensionConstant",},
@@ -71,19 +81,23 @@
       ],"ProxyFiles":[],"copyToTargets":32,"order":[
         {"name":"YaGames_getInitStatus","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_setDebugMode","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_showFullscreenAdv","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_showRewardedVideo","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_browserConsoleLog","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_pageReload","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_getBrowserLang","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_showFullscreenAdv","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_showRewardedVideo","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_getEnvironment","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_setToClipboard","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_getDeviceType","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_getLeaderboard","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_getLeaderboardsPlayerEntry","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_getLeaderboardsEntries","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_getLeaderboardsEntriesOptions","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_setLeaderboardsScore","path":"extensions/YaGames/YaGames.yy",},
-        {"name":"YaGames_setLeaderboardsScoreExtraData","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_setToClipboard","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_Init","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_getByDescription","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_getPlayerEntry","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_getPlayerEntryAvatar","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_getEntries","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_getEntriesAvatar","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_getEntriesOptions","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_setScore","path":"extensions/YaGames/YaGames.yy",},
+        {"name":"YaGames_Leaderboards_setScoreExtraData","path":"extensions/YaGames/YaGames.yy",},
       ],"resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMExtensionFile",},
   ],
   "classname": "",

@@ -1,3 +1,4 @@
+/*
 /// @description Parse YaGames events
 if (not isMap(async_load)) {
     log("async_load got lost in cyberspace");
@@ -130,5 +131,5 @@ if (not isMap(async_load)) {
             break;
         }
    }
-}
+}*/
 
