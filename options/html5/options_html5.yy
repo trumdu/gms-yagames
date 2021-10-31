@@ -1,6 +1,6 @@
 {
   "option_html5_browser_title": "YandexGames Demo",
-  "option_html5_version": "1.0.0.1",
+  "option_html5_version": "1.0.0.2",
   "option_html5_foldername": "html5game",
   "option_html5_outputname": "index.html",
   "option_html5_splash_png": "${base_options_dir}/html5/splash.png",

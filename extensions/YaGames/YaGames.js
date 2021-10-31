@@ -15,6 +15,7 @@ var YaGamesGMS = {
 	_request_id: 0,
 	_ysdk: null,
 	_lb: null,
+	_player: null,
 
 	toErrStr: function (err) {
 		return (err + "");
@@ -133,6 +134,12 @@ var YaGamesGMS = {
 		self.send(request_id, "notLeaderboardInitSDK", "Leaderboard not Initialized");
 	},
 
+	sendPlayerNotInitStatus: function (request_id) {
+		let self = YaGamesGMS;
+		self.browserConsoleLog( "notPlayerInitSDK", request_id, "Player not Initialized");
+		self.send(request_id, "notPlayerInitSDK", "Player not Initialized");
+	},
+
 	delaySend: function (request_id, event, message) {
 		setTimeout(() => {
 			YaGamesGMS.send(request_id, event, message);
@@ -145,7 +152,11 @@ var YaGamesGMS = {
 
 	getLeaderboardInitStatus: function () {
 		return YaGamesGMS._lb !== null;
-	}
+	},
+
+	getPlayerInitStatus: function () {
+		return YaGamesGMS._player !== null;
+	},
 }
 
 /**
@@ -636,6 +647,532 @@ function YaGamesGML_Leaderboards_setScore(cleaderboard_name, cscore, cextra_data
 					self.browserConsoleLog( "Leaderboard SetScore runtime error", req_id, err);
 					self.sendError(req_id, "RuntimeError", err);
 				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Player object Initialization
+ * @param scopes Include name and avatar. The user will see a dialog box asking for access. If the user refuses to grant access, you will only receive their ID.
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_Init(scopes = 0) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player init requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (self.getPlayerInitStatus()) {
+				self.browserConsoleLog( "Player was initialized", req_id);
+				self.send(req_id, "playerInit");
+			}
+			else {
+				try {
+					self._ysdk.getPlayer((scopes > 0))
+						.then((player) => {
+							self._player = player;
+							self.browserConsoleLog( "Player was initialized", req_id);
+							self.send(req_id, "playerInit");
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Player init error", req_id, err);
+							self.sendError(req_id, "playerInitError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err)
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get a permanent unique user ID
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_GetUniqueID() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player ID requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let cid = self._player.getUniqueID();
+					self.browserConsoleLog( "Player ID requested", req_id, cid);
+					self.send(req_id, "playerIdRequest", cid);
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get user IDs across all developer games.
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_GetIDsPerGame() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player IDs Per Game requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					self._player.getIDsPerGame()
+						.then((arr) => {
+							self.browserConsoleLog( "Player IDs Per Game requested", req_id, arr);
+							self.send(req_id, "playerIDsPerGame", arr);
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Player IDs Per Game requested error", req_id, err);
+							self.sendError(req_id, "playerIDsPerGameError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get user photo
+ * @param cavatarSize Photo size. Possible size values are small, medium, and large.
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_GetPhoto(cavatarSize) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Photo requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let cname = self._player.getPhoto(cavatarSize + "");
+					self.browserConsoleLog( "Player Photo requested", req_id, cname);
+					self.send(req_id, "playerPhotoRequest", cname);
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Save user data
+ * @param cdata Object containing key-value pairs.
+ * @param cflush Sequence of sending data
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_SetData(cdata, cflush) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Set Data requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let data = self.parseJson(cdata);
+					let flush = (cflush > 0);
+					self._player.setData(data, flush)
+						.then(() => {
+							self.browserConsoleLog( "Player Set Data requested", req_id);
+							self.send(req_id, "playerSetData");
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Player Set Data requested error", req_id, err);
+							self.sendError(req_id, "playerSetDataError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get user data
+ * @param ckeys List of keys to return.
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_GetData(ckeys) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Get Data requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let keys = (ckeys) ? self.parseJson(ckeys) : undefined;
+					self._player.getData(keys)
+						.then((result) => {
+							self.browserConsoleLog( "Player Get Data requested", req_id, result);
+							self.send(req_id, "playerGetData", result);
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Player Get Data requested error", req_id, err);
+							self.sendError(req_id, "playerGetDataError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Stores numerical user data
+ * @param cstats An object containing key-value pairs, where each value must be a number.
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_SetStats(cstats) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Set Stats requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let stats = self.parseJson(cstats);
+					self._player.setStats(stats)
+						.then(() => {
+							self.browserConsoleLog( "Player Set Stats requested", req_id);
+							self.send(req_id, "playerSetStats");
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Player Set Stats requested error", req_id, err);
+							self.sendError(req_id, "playerSetStatsError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get the numerical data for the user.
+ * @param ckeys List of keys to return.
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_GetStats(ckeys) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Get Stats requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let keys = (ckeys) ? self.parseJson(ckeys) : undefined;
+					self._player.getStats(keys)
+						.then((result) => {
+							self.browserConsoleLog( "Player Get Stats requested", req_id, result);
+							self.send(req_id, "playerGetStats", result);
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Player Get Stats requested error", req_id, err);
+							self.sendError(req_id, "playerGetStatsError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Modifies the user's in-game data.
+ * @param cincrements An object that contains key-value pairs, where each value must be a number.
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_IncrementStats(cincrements) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Increment Stats requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let increments = self.parseJson(cincrements);
+					self._player.incrementStats(increments)
+						.then((result) => {
+							self.browserConsoleLog( "Player Increment Stats requested", req_id, result);
+							self.send(req_id, "playerIncrementStats", result);
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Player Increment Stats requested error", req_id, err);
+							self.sendError(req_id, "playerIncrementStatsError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Player authorization request
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_OpenAuthDialog() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player authorization request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk.auth
+					.openAuthDialog()
+					.then(() => {
+						self.browserConsoleLog( "The player has successfully logged in", req_id);
+						self.send(req_id, "playerLogged");
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "The player is not logged in", req_id, err);
+						self.sendError(req_id, "playerLoggedError", err);
+					});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err);
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get fullscreen status
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Screen_Fullscreen_Status() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "FullScreen status requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				let status = self._ysdk.screen.fullscreen.status;
+				self.browserConsoleLog( "FullScreen status received", req_id, status);
+				self.send(req_id, "fullscreenStatus", status);
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Switch to fullscreen mode
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Screen_Fullscreen_Request() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "FullScreen mode requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk.screen.fullscreen.request()
+					.then(() => {
+						self.browserConsoleLog( "Full screen transition successful", req_id);
+						self.send(req_id, "fullscreenOpened");
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "Switch to fullscreen mode failed", req_id, err);
+						self.sendError(req_id, "fullscreenOpenError", err);
+					});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Exit fullscreen mode
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Screen_Fullscreen_Exit() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "FullScreen Exit requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk.screen.fullscreen.exit()
+					.then(() => {
+						self.browserConsoleLog( "Successful exit from fullscreen mode", req_id);
+						self.send(req_id, "fullscreenExited");
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "Fullscreen exit error", req_id, err);
+						self.sendError(req_id, "fullscreenExitError", err);
+					});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Checking the ability to request an estimate
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Feedback_CanReview() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Сan Review requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk
+					.feedback.canReview()
+					.then((result) => {
+						self.browserConsoleLog( "Request Can Review success", req_id, result);
+						self.send(req_id, "canReview", result);
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "Request Can Review error", req_id, err);
+						self.sendError(req_id, "canReviewError", err);
+					});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Invite the user to rate the game
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Feedback_RequestReview() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Request Review requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk
+					.feedback.requestReview()
+					.then((result) => {
+						self.browserConsoleLog( "Successful request Review", req_id, result);
+						self.send(req_id, "requestReview", result);
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "Request Review error", req_id, err);
+						self.sendError(req_id, "requestReviewError", err);
+					});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
 			}
 		}
 	}, 0);

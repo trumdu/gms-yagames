@@ -1,3 +1,3 @@
 event_inherited();
-text += @"Output to
+text += @"Copy to
 browser console";
