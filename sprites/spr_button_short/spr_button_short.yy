@@ -63,7 +63,7 @@
     "eventToFunction": {},
     "eventStubScript": null,
     "parent": {"name":"spr_button_short","path":"sprites/spr_button_short/spr_button_short.yy",},
-    "resourceVersion": "1.3",
+    "resourceVersion": "1.4",
     "name": "spr_button_short",
     "tags": [],
     "resourceType": "GMSequence",

@@ -63,7 +63,7 @@
     "eventToFunction": {},
     "eventStubScript": null,
     "parent": {"name":"spr_button_long","path":"sprites/spr_button_long/spr_button_long.yy",},
-    "resourceVersion": "1.3",
+    "resourceVersion": "1.4",
     "name": "spr_button_long",
     "tags": [],
     "resourceType": "GMSequence",

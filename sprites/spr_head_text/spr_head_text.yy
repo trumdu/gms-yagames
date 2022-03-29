@@ -59,7 +59,7 @@
     "eventToFunction": {},
     "eventStubScript": null,
     "parent": {"name":"spr_head_text","path":"sprites/spr_head_text/spr_head_text.yy",},
-    "resourceVersion": "1.3",
+    "resourceVersion": "1.4",
     "name": "spr_head_text",
     "tags": [],
     "resourceType": "GMSequence",
