@@ -28,6 +28,7 @@
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_AvatarSizeLarge","hidden":false,"value":"\"large\"",},
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_FullScreen_ON","hidden":false,"value":"\"on\"",},
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_FullScreen_OFF","hidden":false,"value":"\"off\"",},
+        {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_DeviceTV","hidden":false,"value":"\"tv\"",},
       ],"copyToTargets":32,"filename":"YaGames.js","final":"","functions":[
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_getInitStatus","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_getInitStatus","help":"YaGames_getInitStatus()","hidden":false,"kind":5,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_setDebugMode","argCount":0,"args":[
@@ -114,6 +115,23 @@
           ],"documentation":"","externalName":"YaGamesGML_Player_IncrementStats","help":"YaGames_Player_IncrementStats(increments)","hidden":false,"kind":5,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Player_GetAllData","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Player_GetData","help":"YaGames_Player_GetAllData()","hidden":false,"kind":5,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Player_GetAllStats","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Player_GetStats","help":"YaGames_Player_GetAllStats()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Shortcut_CanShowPrompt","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_Shortcut_CanShowPrompt","help":"YaGames_Shortcut_CanShowPrompt()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Shortcut_ShowPrompt","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_Shortcut_ShowPrompt","help":"YaGames_Shortcut_ShowPrompt()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Banner_getAdvStatus","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Banner_getAdvStatus","help":"YaGames_Banner_getAdvStatus()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Banner_ShowAdv","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Banner_ShowAdv","help":"YaGames_Banner_ShowAdv()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Banner_HideAdv","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Banner_HideAdv","help":"YaGames_Banner_HideAdv()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Payments_Init","argCount":1,"args":[
+            2,
+          ],"documentation":"","externalName":"YaGamesGML_Payments_Init","help":"YaGames_Payments_Init(signed)","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Payments_Purchase","argCount":0,"args":[
+            1,
+            1,
+          ],"documentation":"","externalName":"YaGamesGMS_Payments_Purchase","help":"YaGames_Payments_Purchase(id, developerPayload)","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Payments_GetPurchases","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_Payments_GetPurchases","help":"YaGames_Payments_GetPurchases()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Payments_GetCatalog","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_Payments_GetCatalog","help":"YaGames_Payments_GetCatalog()","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Payments_ConsumePurchase","argCount":0,"args":[
+            1,
+          ],"documentation":"","externalName":"YaGamesGMS_Payments_ConsumePurchase","help":"YaGames_Payments_ConsumePurchase(purchase_token)","hidden":false,"kind":5,"returnType":2,},
       ],"init":"","kind":5,"order":[
         {"name":"YaGames_getInitStatus","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_setDebugMode","path":"extensions/YaGames/YaGames.yy",},

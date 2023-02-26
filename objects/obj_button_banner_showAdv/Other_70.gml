@@ -9,29 +9,19 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "deviceType":
-				// Device Type
-                var _value = async_load[? "value"];
-				switch (_value) {
-					case YaGames_DeviceDesktop:
-						dev_type = "Desktop";
-						break;
-					case YaGames_DeviceTablet:
-						dev_type = "Tablet";
-						break;
-					case YaGames_DeviceMobile:
-						dev_type = "Mobile";
-						break;
-					case YaGames_DeviceTV:
-						dev_type = "TV";
-						break;
-					case YaGames_DeviceUndefined:
-						dev_type = "Undefined";
-						break;
-					default:
-						dev_type = "ERROR " + string(_value);
-				}
-			break;
+            case "bannerShown":
+                // The banner is displayed
+            break;
+            case "bannerNotShown":
+                var reason = async_load[? "value"];	
+                // The banner is not displayed
+            break;
+            case "getBannerStatusError":
+                var errCode = async_load[? "code"];
+                var errName = async_load[? "name"];
+                var errMessage = async_load[? "message"];		
+                // Banner request error
+            break;
 			
             case "notInitSDK":
                 // SDK not initialized
@@ -45,3 +35,4 @@ if (not isMap(async_load)) {
         }
    }
 }
+

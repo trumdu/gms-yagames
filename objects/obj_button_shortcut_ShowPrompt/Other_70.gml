@@ -9,29 +9,16 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "deviceType":
-				// Device Type
-                var _value = async_load[? "value"];
-				switch (_value) {
-					case YaGames_DeviceDesktop:
-						dev_type = "Desktop";
-						break;
-					case YaGames_DeviceTablet:
-						dev_type = "Tablet";
-						break;
-					case YaGames_DeviceMobile:
-						dev_type = "Mobile";
-						break;
-					case YaGames_DeviceTV:
-						dev_type = "TV";
-						break;
-					case YaGames_DeviceUndefined:
-						dev_type = "Undefined";
-						break;
-					default:
-						dev_type = "ERROR " + string(_value);
-				}
-			break;
+            case "shortcutCreated":
+                var data = async_load[? "data"];
+                // Shortcut show promt
+            break;
+            case "shortcutCreateError":
+                var errCode = async_load[? "code"];
+                var errName = async_load[? "name"];
+                var errMessage = async_load[? "message"];			
+                // Shortcut show promt error
+            break;
 			
             case "notInitSDK":
                 // SDK not initialized
@@ -45,3 +32,4 @@ if (not isMap(async_load)) {
         }
    }
 }
+

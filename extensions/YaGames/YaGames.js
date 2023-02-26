@@ -16,6 +16,7 @@ var YaGamesGMS = {
 	_ysdk: null,
 	_lb: null,
 	_player: null,
+	_payments: null,
 
 	toErrStr: function (err) {
 		return (err + "");
@@ -140,6 +141,12 @@ var YaGamesGMS = {
 		self.send(request_id, "notPlayerInitSDK", "Player not Initialized");
 	},
 
+	sendPaymentsNotInitStatus: function (request_id) {
+		let self = YaGamesGMS;
+		self.browserConsoleLog( "notPaymentsInitSDK", request_id, "Payments not Initialized");
+		self.send(request_id, "notPaymentsInitSDK", "Payments not Initialized");
+	},
+
 	delaySend: function (request_id, event, message) {
 		setTimeout(() => {
 			YaGamesGMS.send(request_id, event, message);
@@ -157,6 +164,10 @@ var YaGamesGMS = {
 	getPlayerInitStatus: function () {
 		return YaGamesGMS._player !== null;
 	},
+
+	getPaymentsInitStatus: function () {
+		return YaGamesGMS._payments !== null;
+	},
 }
 
 /**
@@ -167,6 +178,8 @@ function YaGamesGMS_SdkInit() {
 	YaGames.init().then(ysdk => {
 		console.log('Yandex SDK initialized');
 		self._ysdk = ysdk;
+		// We show the SDK that the game has loaded and you can start playing.
+		self._ysdk.features.LoadingAPI?.ready();
 	});
 }
 
@@ -342,6 +355,118 @@ function YaGamesGMS_showRewardedVideo() {
 						},
 					},
 				});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get the banner status
+ * @returns {Number} Request_id
+ */
+ function YaGamesGML_Banner_getAdvStatus() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Banner status request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk
+				.adv.getBannerAdvStatus()
+				.then(({ result }) => {
+					if (result) {
+						self.browserConsoleLog( "Banner is showing.", req_id);
+						self.send(req_id, "bannerShowing");
+					} else {
+						self.browserConsoleLog( "Banner is hidden.", req_id);
+						self.send(req_id, "bannerHidden");
+					}
+				})
+                .catch((err) => {
+					self.browserConsoleLog( "Get Banner status error", req_id, err);
+					self.sendError(req_id, "getBannerStatusError", err);
+                });;
+
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Show sticky banner
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Banner_ShowAdv() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Banner show request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk
+				.adv.showBannerAdv()
+				.then(({ result , reason }) => {
+					if (result) {
+						self.browserConsoleLog( "Banner shown.", req_id);
+						self.send(req_id, "bannerShown");
+					} else {
+						self.browserConsoleLog( "Banner not shown.", req_id, reason);
+						self.send(req_id, "bannerNotShown", reason);
+					}
+				})
+                .catch((err) => {
+					self.browserConsoleLog( "Banner show error", req_id, err);
+					self.sendError(req_id, "bannerShowError", err);
+                });;
+
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Hide sticky banner
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Banner_HideAdv() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Banner hide request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk
+                .adv.hideBannerAdv()
+                .then((result) => {
+					self.browserConsoleLog( "Banner hidden", req_id, result);
+					self.send(req_id, "bannerHidden", result);
+                })
+                .catch((err) => {
+					self.browserConsoleLog( "Banner hide error", req_id, err);
+					self.sendError(req_id, "bannerHideError", err);
+                });
+
 			} catch (err) {
 				self.browserConsoleLog( "Runtime error", req_id, err);
 				self.sendError(req_id, "RuntimeError", err)
@@ -1173,6 +1298,303 @@ function YaGamesGMS_Feedback_RequestReview() {
 			} catch (err) {
 				self.browserConsoleLog( "Runtime error", req_id, err);
 				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Checking the ability to add a shortcut to the game
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Shortcut_CanShowPrompt() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Сan Shortcut requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk
+                	.shortcut.canShowPrompt()
+					.then((result) => {
+						self.browserConsoleLog( "Request Can Shortcut success", req_id, result);
+						self.send(req_id, "canShortcut", result);
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "Request Can Shortcut error", req_id, err);
+						self.sendError(req_id, "canShortcutError", err);
+					});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Request to add a shortcut to the game
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Shortcut_ShowPrompt() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Shortcut create requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			try {
+				self._ysdk
+					.shortcut.showPrompt()
+					.then((result) => {
+						self.browserConsoleLog( "Successful created Shortcut", req_id, result);
+						self.send(req_id, "shortcutCreated", result);
+					})
+					.catch((err) => {
+						self.browserConsoleLog( "Shortcut create error", req_id, err);
+						self.sendError(req_id, "shortcutCreateError", err);
+					});
+			} catch (err) {
+				self.browserConsoleLog( "Runtime error", req_id, err);
+				self.sendError(req_id, "RuntimeError", err)
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Payments object Initialization
+ * @param signed Add a signature to confirm the purchase.
+ * @returns {Number} Request_id
+ */
+ function YaGamesGML_Payments_Init(signed = 1) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Payments init requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (self.getPaymentsInitStatus()) {
+				self.browserConsoleLog( "Payments was initialized", req_id);
+				self.send(req_id, "paymentsInit");
+			}
+			else {
+				try {
+					let options = { signed: true };
+					if (signed <= 0) {
+						options = { signed: false };
+					}
+					self._ysdk.getPayments(options)
+						.then((payments) => {
+							self._payments = payments;
+							self.browserConsoleLog( "Payments was initialized", req_id);
+							self.send(req_id, "paymentsInit");
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Payments init error", req_id, err);
+							self.sendError(req_id, "paymentsInitError", err);
+						});
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err)
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Payments object Initialization
+ * @param cid Product ID.
+ * @param cdeveloperPayload Additional information about the purchase that you want to transfer to your server.
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Payments_Purchase(cid, cdeveloperPayload) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Purchase request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPaymentsInitStatus()) {
+				self.sendPaymentsNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let options = { id: cid };
+					if (cdeveloperPayload) {
+						options = { 
+							id: cid,
+							developerPayload: cdeveloperPayload
+						};
+					}
+					self._payments
+						.purchase(options)
+						.then((p) => {
+							let tmp = {
+								developerPayload: p.developerPayload,
+								productID: p.productID,
+								purchaseTime: p.purchaseTime,
+								purchaseToken: p.purchaseToken,
+								signature: p.signature,
+							};
+							self.browserConsoleLog( "Purchase requested", req_id, tmp);
+							self.send(req_id, "purchaseRequested", tmp);
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Purchase request error", req_id, err);
+							self.sendError(req_id, "purchaseRequestError", err);
+						});
+
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get a purchases list
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Payments_GetPurchases() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Get all purchases", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPaymentsInitStatus()) {
+				self.sendPaymentsNotInitStatus(req_id);
+			}
+			else {
+				try {
+					self._payments
+						.getPurchases()
+						.then((purchases) => {
+							let tmp = {
+								purchases: [],
+								signature: purchases.signature,
+							};
+							for (let i = 0; i < purchases.length; i++) {
+								let p = purchases[i];
+								tmp.purchases.push({
+									developerPayload: p.developerPayload,
+									productID: p.productID,
+									purchaseTime: p.purchaseTime,
+									purchaseToken: p.purchaseToken,
+								});
+							}
+							self.browserConsoleLog( "Get Purchases requested", req_id, tmp);
+							self.send(req_id, "getPurchases", tmp);
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Get Purchases error", req_id, err);
+							self.sendError(req_id, "getPurchasesError", err);
+						});
+
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Getting a catalog of all products
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Payments_GetCatalog() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Get the product catalog", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPaymentsInitStatus()) {
+				self.sendPaymentsNotInitStatus(req_id);
+			}
+			else {
+				try {
+					self._payments
+						.getCatalog()
+						.then((products) => {
+							self.browserConsoleLog( "Get Сatalog", req_id, products);
+							self.send(req_id, "getСatalog", products);
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Get Сatalog error", req_id, err);
+							self.sendError(req_id, "getСatalogError", err);
+						});
+
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Checking unprocessed purchases
+ * @param cpurchase_token Purchase Token.
+ * @returns {Number} Request_id
+ */
+function YaGamesGMS_Payments_ConsumePurchase(cpurchase_token) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Consume Purchase", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPaymentsInitStatus()) {
+				self.sendPaymentsNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let purchase_token = cpurchase_token;
+					self._payments
+						.consumePurchase(purchase_token)
+						.then(() => {
+							self.browserConsoleLog( "Consume purchase requested", req_id);
+							self.send(req_id, "consumePurchase");
+						})
+						.catch((err) => {
+							self.browserConsoleLog( "Consume purchase error", req_id, err);
+							self.sendError(req_id, "consumePurchaseError", err);
+						});
+
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
 			}
 		}
 	}, 0);

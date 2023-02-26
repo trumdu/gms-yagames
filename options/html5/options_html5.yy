@@ -28,6 +28,6 @@
   "option_html5_usebuiltinfont": false,
   "option_html5_usebuiltinparticles": false,
   "option_html5_usesplash": false,
-  "option_html5_version": "1.0.0.2",
+  "option_html5_version": "1.0.0.5",
   "option_html5_webgl": 2,
 }
