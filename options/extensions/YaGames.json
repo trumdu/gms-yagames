@@ -1,0 +1,9 @@
+{
+  "resourceType": "GMExtensionConfigSet",
+  "configurables": null,
+  "extensionId": {
+    "name": "YaGames",
+    "path": "extensions/YaGames/YaGames.yy"
+  },
+  "resourceVersion": "1.0"
+}
