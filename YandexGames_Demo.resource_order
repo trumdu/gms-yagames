@@ -13,7 +13,9 @@
     {"name":"General","order":10,"path":"folders/Objects/Buttons/General.yy",},
     {"name":"Leaderboards","order":14,"path":"folders/Objects/Buttons/Leaderboards.yy",},
     {"name":"Log","order":12,"path":"folders/Objects/Buttons/Log.yy",},
+    {"name":"Payments","order":19,"path":"folders/Objects/Buttons/Payments.yy",},
     {"name":"Player","order":15,"path":"folders/Objects/Buttons/Player.yy",},
+    {"name":"Shortcut","order":18,"path":"folders/Objects/Buttons/Shortcut.yy",},
     {"name":"Header_text","order":3,"path":"folders/Objects/Header_text.yy",},
     {"name":"Paths","order":7,"path":"folders/Paths.yy",},
     {"name":"Rooms","order":19,"path":"folders/Rooms.yy",},
@@ -25,8 +27,6 @@
     {"name":"Sprites","order":1,"path":"folders/Sprites.yy",},
     {"name":"Tile Sets","order":3,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":15,"path":"folders/Timelines.yy",},
-    {"name":"Shortcut","order":18,"path":"folders/Objects/Buttons/Shortcut.yy",},
-    {"name":"Payments","order":19,"path":"folders/Objects/Buttons/Payments.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"obj_button_getPlayerPhoto","order":5,"path":"objects/obj_button_getPlayerPhoto/obj_button_getPlayerPhoto.yy",},
@@ -71,6 +71,7 @@
     {"name":"obj_header_device_info","order":4,"path":"objects/obj_header_device_info/obj_header_device_info.yy",},
     {"name":"obj_header_payments","order":2,"path":"objects/obj_header_payments/obj_header_payments.yy",},
     {"name":"log","order":1,"path":"scripts/log/log.yy",},
+    {"name":"obj_button_getPlayerMode","order":13,"path":"objects/obj_button_getPlayerMode/obj_button_getPlayerMode.yy",},
     {"name":"obj_button_getPlayerData","order":6,"path":"objects/obj_button_getPlayerData/obj_button_getPlayerData.yy",},
     {"name":"obj_button_getLeaderboardsPlayerEntryAvatar","order":5,"path":"objects/obj_button_getLeaderboardsPlayerEntryAvatar/obj_button_getLeaderboardsPlayerEntryAvatar.yy",},
     {"name":"spr_button_long","order":2,"path":"sprites/spr_button_long/spr_button_long.yy",},
@@ -91,6 +92,5 @@
     {"name":"obj_button_getPlayerIDsPerGame","order":4,"path":"objects/obj_button_getPlayerIDsPerGame/obj_button_getPlayerIDsPerGame.yy",},
     {"name":"obj_button_getEnvironment","order":1,"path":"objects/obj_button_getEnvironment/obj_button_getEnvironment.yy",},
     {"name":"spr_temp","order":5,"path":"sprites/spr_temp/spr_temp.yy",},
-    {"name":"YaGames","order":1,"path":"extensions/YaGames/YaGames.yy",},
   ],
 }

@@ -9,20 +9,14 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "playerAlreadyLogged":
-				// The player has already been logged in (mode != 'lite')
-			break;
-            case "playerLogged":
-                // The player has successfully logged in
-            break;
-            case "playerLoggedError":
-                var errCode = async_load[? "code"];
-                var errName = async_load[? "name"];
-                var errMessage = async_load[? "message"];			
-                // The player is not logged in
-				
+            case "playerGetModeRequest":
+                // Player mode request success
+                var mode = async_load[? "value"];
             break;
 			
+            case "notPlayerInitSDK":
+                // Player in SDK not initialized
+            break;
             case "notInitSDK":
                 // SDK not initialized
             break;

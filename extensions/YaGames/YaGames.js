@@ -276,6 +276,14 @@ function YaGamesGML_setToClipboard(ctext) {
 	return req_id;
 }
 
+/***
+ * Вибрация мобильного устройства в течении N миллисекунд
+ * @param {Number} ms
+ */
+function YaGamesGML_MobileVibro(ms = 200) {
+	window.navigator.vibrate(Number(ms));
+}
+
 /**
  * Request to show fullscreen ads
  * @returns {Number} Request_id
@@ -1116,6 +1124,37 @@ function YaGamesGML_Player_IncrementStats(cincrements) {
 }
 
 /**
+ * Player Get Mode
+ * @returns {Number} Request_id
+ */
+function YaGamesGML_Player_GetMode() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player GetMode requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+		}
+		else {
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					let cid = self._player.getMode();
+					self.browserConsoleLog( "Player GetMode requested", req_id, cid);
+					self.send(req_id, "playerGetModeRequest", cid);
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
+			}
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
  * Player authorization request
  * @returns {Number} Request_id
  */
@@ -1128,20 +1167,31 @@ function YaGamesGML_OpenAuthDialog() {
 			self.sendSdkNotInitStatus(req_id);
 		}
 		else {
-			try {
-				self._ysdk.auth
-					.openAuthDialog()
-					.then(() => {
-						self.browserConsoleLog( "The player has successfully logged in", req_id);
-						self.send(req_id, "playerLogged");
-					})
-					.catch((err) => {
-						self.browserConsoleLog( "The player is not logged in", req_id, err);
-						self.sendError(req_id, "playerLoggedError", err);
-					});
-			} catch (err) {
-				self.browserConsoleLog( "Runtime error", req_id, err);
-				self.sendError(req_id, "RuntimeError", err);
+			if (!self.getPlayerInitStatus()) {
+				self.sendPlayerNotInitStatus(req_id);
+			}
+			else {
+				try {
+					if (self._player.getMode() === 'lite') {
+						self._ysdk.auth
+							.openAuthDialog()
+							.then(() => {
+								self.browserConsoleLog( "The player has successfully logged in", req_id);
+								self.send(req_id, "playerLogged");
+							})
+							.catch((err) => {
+								self.browserConsoleLog( "The player is not logged in", req_id, err);
+								self.sendError(req_id, "playerLoggedError", err);
+							});
+					}
+					else {
+						self.browserConsoleLog( "The player is already logged in", req_id);
+						self.send(req_id, "playerAlreadyLogged");
+					}
+				} catch (err) {
+					self.browserConsoleLog( "Runtime error", req_id, err);
+					self.sendError(req_id, "RuntimeError", err);
+				}
 			}
 		}
 	}, 0);

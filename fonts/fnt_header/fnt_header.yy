@@ -390,6 +390,7 @@
     {"amount":-1,"first":1102,"second":1095,},
   ],
   "last": 0,
+  "lineHeight": 0,
   "maintainGms1Font": false,
   "parent": {
     "name": "Fonts",
@@ -402,6 +403,7 @@
   ],
   "regenerateBitmap": false,
   "sampleText": "abcdef ABCDEF\n0123456789 .,<>\"'&!?\nthe quick brown fox jumps over the lazy dog\nTHE QUICK BROWN FOX JUMPS OVER THE LAZY DOG\n\nDefault Character(9647) ▯",
+  "sdfSpread": 8,
   "size": 14.0,
   "styleName": "Bold",
   "textureGroupId": {
@@ -409,4 +411,5 @@
     "path": "texturegroups/Default",
   },
   "TTFName": "",
+  "usesSDF": false,
 }

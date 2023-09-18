@@ -16,7 +16,7 @@
   "date": "2020-10-03T02:05:14",
   "description": "",
   "exportToGame": true,
-  "extensionVersion": "1.0.2",
+  "extensionVersion": "1.0.3",
   "files": [
     {"resourceType":"GMExtensionFile","resourceVersion":"1.0","name":"","constants":[
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_DeviceMobile","hidden":false,"value":"\"mobile\"",},
@@ -132,6 +132,10 @@
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Payments_ConsumePurchase","argCount":0,"args":[
             1,
           ],"documentation":"","externalName":"YaGamesGMS_Payments_ConsumePurchase","help":"YaGames_Payments_ConsumePurchase(purchase_token)","hidden":false,"kind":5,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_MobileVibro","argCount":-1,"args":[
+            2,
+          ],"documentation":"","externalName":"YaGamesGML_MobileVibro","help":"YaGames_MobileVibro(double ms = 200)","hidden":false,"kind":5,"returnType":1,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_Player_GetMode","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Player_GetMode","help":"YaGames_Player_GetMode()","hidden":false,"kind":5,"returnType":2,},
       ],"init":"","kind":5,"order":[
         {"name":"YaGames_getInitStatus","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_setDebugMode","path":"extensions/YaGames/YaGames.yy",},
@@ -174,6 +178,8 @@
   "gradleinject": "",
   "hasConvertedCodeInjection": true,
   "helpfile": "",
+  "HTML5CodeInjection": "",
+  "html5Props": false,
   "IncludedResources": [],
   "installdir": "",
   "iosCocoaPodDependencies": "",

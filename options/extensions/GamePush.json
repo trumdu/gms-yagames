@@ -1,0 +1,31 @@
+{
+  "resourceType": "GMExtensionConfigSet",
+  "configurables": {
+    "da470813-706c-4a57-9f70-c0df28d362e1": {
+      "Default": {
+        "value": "1449"
+      }
+    },
+    "900a252e-2ba7-4488-b993-5434ff482ec9": {
+      "Default": {
+        "value": "GXL69KpYovWmac0rBBTEjxhMxztwxdnG"
+      }
+    },
+    "6c209f0a-6fff-4248-8959-d4db35d2019a": null,
+    "57191536-f424-4740-a445-1447bf0db784": {
+      "Default": {
+        "value": "True"
+      }
+    },
+    "9089d6f9-db1c-4547-9490-2d93dde16d03": {
+      "Default": {
+        "value": "True"
+      }
+    }
+  },
+  "extensionId": {
+    "name": "GamePush",
+    "path": "extensions/GamePush/GamePush.yy"
+  },
+  "resourceVersion": "1.0"
+}
