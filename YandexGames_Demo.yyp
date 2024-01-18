@@ -43,7 +43,7 @@
   "isEcma": false,
   "LibraryEmitters": [],
   "MetaData": {
-    "IDEVersion": "2023.6.0.89",
+    "IDEVersion": "2023.8.2.108",
   },
   "resources": [
     {"id":{"name":"obj_button_oauth","path":"objects/obj_button_oauth/obj_button_oauth.yy",},},
@@ -94,9 +94,9 @@
     {"id":{"name":"obj_button_getFeedbackCanReview","path":"objects/obj_button_getFeedbackCanReview/obj_button_getFeedbackCanReview.yy",},},
     {"id":{"name":"obj_header_payments","path":"objects/obj_header_payments/obj_header_payments.yy",},},
     {"id":{"name":"log","path":"scripts/log/log.yy",},},
-    {"id":{"name":"YaGames","path":"extensions/YaGames/YaGames.yy",},},
     {"id":{"name":"obj_childrenPayments_parent","path":"objects/obj_childrenPayments_parent/obj_childrenPayments_parent.yy",},},
     {"id":{"name":"obj_button_getPlayerMode","path":"objects/obj_button_getPlayerMode/obj_button_getPlayerMode.yy",},},
+    {"id":{"name":"YaGames","path":"extensions/YaGames/YaGames.yy",},},
     {"id":{"name":"obj_button_getPlayerData","path":"objects/obj_button_getPlayerData/obj_button_getPlayerData.yy",},},
     {"id":{"name":"obj_button_getLeaderboardsPlayerEntryAvatar","path":"objects/obj_button_getLeaderboardsPlayerEntryAvatar/obj_button_getLeaderboardsPlayerEntryAvatar.yy",},},
     {"id":{"name":"spr_button_long","path":"sprites/spr_button_long/spr_button_long.yy",},},
@@ -126,6 +126,7 @@
   "RoomOrderNodes": [
     {"roomId":{"name":"room_demo","path":"rooms/room_demo/room_demo.yy",},},
   ],
+  "templateType": null,
   "TextureGroups": [
     {"resourceType":"GMTextureGroup","resourceVersion":"1.3","name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"targets":-1,},
   ],
