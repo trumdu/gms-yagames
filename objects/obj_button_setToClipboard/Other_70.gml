@@ -9,13 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "clipboardSuccess":
+            case YaGames_CallClipboardSuccess:
                 // Success of copy to clipboard
             break;
-            case "clipboardError":
-                var errCode = async_load[? "code"];
-                var errName = async_load[? "name"];
-                var errMessage = async_load[? "message"];			
+            case YaGames_CallClipboardError:
+                var _code = async_load[? "code"];
+                var _name = async_load[? "name"];
+                var _message = async_load[? "message"];			
                 // Copy to clipboard error
             break;
 			
@@ -23,9 +23,9 @@ if (not isMap(async_load)) {
                 // SDK not initialized
             break;
             case YaGames_CallRuntimeError:
-                var errCode = async_load[? "code"];
-                var errName = async_load[? "name"];
-                var errMessage = async_load[? "message"];	
+                var _code = async_load[? "code"];
+                var _name = async_load[? "name"];
+                var _message = async_load[? "message"];	
                 // SDK runtime error
             break;
         }

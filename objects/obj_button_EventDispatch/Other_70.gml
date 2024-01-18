@@ -9,25 +9,17 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "purchaseRequested":
-                // Payments Purchasen success
-				var _purchase = json_parse(async_load[? "data"]);
-				log("Purchase ID: " + _purchase.productID);
-				//_purchase.purchaseToken
-				//_purchase.purchaseTime
-				//_purchase.developerPayload
-            break;
-            case "purchaseRequestError":
+			case "eventDispatch":
+				// Event Dispatch
+				var _event_name = async_load[? "value"];
+				log("Event Dispatch: " + _event_name);
+			break;
+            case "eventDispatchError":
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
-                var errMessage = async_load[? "message"];			
-                // Payments Purchasen error
-				
+                var errMessage = async_load[? "message"];	
             break;
 			
-            case "notPaymentsInitSDK":
-                // Payments in SDK not initialized
-            break;
             case YaGames_CallNotInitSDK:
                 // SDK not initialized
             break;
@@ -40,4 +32,3 @@ if (not isMap(async_load)) {
         }
    }
 }
-

@@ -1616,19 +1616,22 @@ function YaGamesGMS_GetFlags(defaultFlags = "", clientFeatures = "") {
 			return;
 		}
 		try {
-			let dFlags = (defaultFlags.length > 0) ? self.parseJson(defaultFlags) : undefined;
-			let cFeatures = undefined;
-			if (clientFeatures.length > 0) {
-				if (dFlags == null) dFlags = {};
-				cFeatures = [];
-				let _t = self.parseJson(clientFeatures);
-				for (let _k in _t) {
-					if (_t.hasOwnProperty(_k)) {
-						cFeatures.push({ name: String(_k), value: String(_t[_k]) });
+			let _options = undefined;
+			if ((defaultFlags.length > 0) || (clientFeatures.length > 0)) {
+				_options = {
+					defaultFlags: (defaultFlags.length > 0) ? self.parseJson(defaultFlags) : {}
+				};
+				if (clientFeatures.length > 0) {
+					_options.clientFeatures = [];
+					let _t = self.parseJson(clientFeatures);
+					for (let _k in _t) {
+						if (_t.hasOwnProperty(_k)) {
+							_options.clientFeatures.push({ name: String(_k), value: String(_t[_k]) });
+						}
 					}
 				}
 			}
-			self._ysdk.getFlags(dFlags, cFeatures)
+			self._ysdk.getFlags(_options)
 				.then((flags) => {
 					self.browserConsoleLog( "Get Flags requested", req_id, flags);
 					self.send(req_id, "getFlags", flags);

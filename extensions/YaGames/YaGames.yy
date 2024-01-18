@@ -34,6 +34,10 @@
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_AsyncEvent","hidden":false,"value":"\"YaGames\"",},
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_CallRuntimeError","hidden":false,"value":"\"RuntimeError\"",},
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_CallNotInitSDK","hidden":false,"value":"\"notInitSDK\"",},
+        {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_CallEnvironment","hidden":false,"value":"\"environment\"",},
+        {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_CallClipboardSuccess","hidden":false,"value":"\"clipboardSuccess\"",},
+        {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_CallClipboardError","hidden":false,"value":"\"clipboardError\"",},
+        {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"YaGames_CallGameReady","hidden":false,"value":"\"gameReady\"",},
       ],"copyToTargets":144115188075855904,"filename":"YaGames.js","final":"","functions":[
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_getInitStatus","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_getInitStatus","help":"YaGames_getInitStatus()","hidden":false,"kind":5,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"YaGames_setDebugMode","argCount":0,"args":[
@@ -191,17 +195,6 @@
         {"name":"YaGames_Player_GetAllData","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_Player_GetAllStats","path":"extensions/YaGames/YaGames.yy",},
       ],"origname":"","ProxyFiles":[],"uncompress":false,"usesRunnerInterface":false,},
-    {"resourceType":"GMExtensionFile","resourceVersion":"1.0","name":"","constants":[],"copyToTargets":-1,"filename":"browser_hdpi.js","final":"","functions":[
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"browser_get_device_pixel_ratio","argCount":0,"args":[],"documentation":"","externalName":"browser_get_device_pixel_ratio","help":"browser_get_device_pixel_ratio()","hidden":false,"kind":5,"returnType":1,},
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"browser_stretch_canvas_ext","argCount":0,"args":[
-            2,
-            2,
-            2,
-          ],"documentation":"","externalName":"browser_stretch_canvas_ext","help":"browser_stretch_canvas_ext(canvas_id, w, h)","hidden":false,"kind":5,"returnType":1,},
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"browser_scrollbars_enable","argCount":0,"args":[
-            2,
-          ],"documentation":"","externalName":"browser_scrollbars_enable","help":"browser_scrollbars_enable(z)","hidden":false,"kind":5,"returnType":1,},
-      ],"init":"","kind":5,"order":[],"origname":"","ProxyFiles":[],"uncompress":false,"usesRunnerInterface":false,},
   ],
   "gradleinject": "",
   "hasConvertedCodeInjection": true,

@@ -11,7 +11,17 @@ if (not isMap(async_load)) {
 			
             case "getСatalog":
                 // Get Purchases success
-                var lb_data = async_load[? "data"];
+				var _data = json_parse(async_load[? "data"]);
+				array_foreach(_data, function(_product)
+				{
+					log("Product: " + _product.title);
+					//_product.id
+					//_product.description
+					//_product.imageURI
+					//_product.price
+					//_product.priceValue
+					//_product.priceCurrencyCode
+				});
             break;
             case "getСatalogError":
                 var errCode = async_load[? "code"];

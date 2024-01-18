@@ -9,8 +9,17 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "environment":
+            case YaGames_CallEnvironment:
                 // Environment data
+				var _data = json_parse(async_load[? "data"]);
+				var _lang = _data.i18n.lang;
+				// _data.i18n.tld;
+				var _app_id = _data.app.id;
+				// _data.data.baseUrl;
+				// _data.data.secondDomain;
+				// _data.isTelegram;
+				log("App ID: " + _app_id);
+				log("Lang: " + _lang);
             break;
 			
             case YaGames_CallNotInitSDK:
