@@ -9,11 +9,12 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "canShortcut":
-                var data = async_load[? "data"];
+            case YaGames_CallCanShortcut:
+				var _data = json_parse(async_load[? "data"]);
+				log("Can Shortcut? " + (_data.canShow ? "true" : "false"));
                 // Shortcut Can show promt
             break;
-            case "canShortcutError":
+            case YaGames_CallCanShortcutError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			

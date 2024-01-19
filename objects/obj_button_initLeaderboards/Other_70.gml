@@ -9,13 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "leaderboardsInit":
+            case YaGames_CallLeaderboardsInit:
                 // Leaderboard initialization success
 				with (obj_childrenLeaderboards_parent) {
 					is_disabled = false;	
 				}
             break;
-            case "leaderboardsInitError":
+            case YaGames_CallLeaderboardsInitError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			

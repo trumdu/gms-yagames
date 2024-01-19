@@ -9,13 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "paymentsInit":
+            case YaGames_CallPaymentsInit:
                 // Payments initialization success
 				with (obj_childrenPayments_parent) {
 					is_disabled = false;	
 				}
             break;
-            case "paymentsInitError":
+            case YaGames_CallPaymentsInitError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			

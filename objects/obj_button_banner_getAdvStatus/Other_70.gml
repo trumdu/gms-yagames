@@ -9,13 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "bannerShowing":
+            case YaGames_CallBannerShowing:
                 // The banner is being displayed
             break;
-            case "bannerHidden":
+            case YaGames_CallBannerHidden:
                 // The banner is not displayed
             break;
-            case "getBannerStatusError":
+            case YaGames_CallGetBannerStatusError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			

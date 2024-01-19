@@ -9,7 +9,7 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "purchaseRequested":
+            case YaGames_CallPurchaseRequested:
                 // Payments Purchasen success
 				var _purchase = json_parse(async_load[? "data"]);
 				log("Purchase ID: " + _purchase.productID);
@@ -17,7 +17,7 @@ if (not isMap(async_load)) {
 				//_purchase.purchaseTime
 				//_purchase.developerPayload
             break;
-            case "purchaseRequestError":
+            case YaGames_CallPurchaseRequestError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			
@@ -25,7 +25,7 @@ if (not isMap(async_load)) {
 				
             break;
 			
-            case "notPaymentsInitSDK":
+            case YaGames_CallNotPaymentsInitSDK:
                 // Payments in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:

@@ -9,7 +9,7 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "onEvent":
+			case YaGames_CallOnEvent:
 				// Event On
 				log("Event ON: " + async_load[? "value"]);
 				alarm[0] = 20;

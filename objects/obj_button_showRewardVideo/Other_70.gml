@@ -9,16 +9,16 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "rewardOpened":
+            case YaGames_CallRewardOpened:
                 // Video advertising is open
             break;
-            case "rewardReceived":
+            case YaGames_CallRewardReceived:
                 // The video ads has been successfully completed. The reward has been received.
             break;
-            case "rewardClosed":
+            case YaGames_CallRewardClosed:
                 // The video ads is closed
             break;
-            case "rewardError":
+            case YaGames_CallRewardError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			

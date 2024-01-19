@@ -9,7 +9,7 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "fullscreenStatus":
+			case YaGames_CallFullscreenStatus:
 				// Fullscreen Status
                 var _value = async_load[? "value"];
 				switch (_value) {

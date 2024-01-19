@@ -9,11 +9,10 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "fullscreenExited":
+            case YaGames_CallFullscreenExited:
                 // Fullscreen exit getting
-                var _data = async_load[? "data"];
             break;
-            case "fullscreenExitError":
+            case YaGames_CallFullscreenExitError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];	

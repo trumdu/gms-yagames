@@ -9,11 +9,12 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "requestReview":
+            case YaGames_CallRequestReview:
                 // Feedback RequestReview getting
-                var _data = async_load[? "data"];
+				var _data = json_parse(async_load[? "data"]);
+				log("Feedback Sent? " + (_data.feedbackSent ? "true" : "false"));
             break;
-            case "requestReviewError":
+            case YaGames_CallRequestReviewError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];	

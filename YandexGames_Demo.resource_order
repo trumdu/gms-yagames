@@ -8,7 +8,9 @@
     {"name":"Buttons","order":1,"path":"folders/Objects/Buttons.yy",},
     {"name":"Ads","order":9,"path":"folders/Objects/Buttons/Ads.yy",},
     {"name":"DeviceInfo","order":13,"path":"folders/Objects/Buttons/DeviceInfo.yy",},
+    {"name":"Events","order":20,"path":"folders/Objects/Buttons/Events.yy",},
     {"name":"Feedback","order":16,"path":"folders/Objects/Buttons/Feedback.yy",},
+    {"name":"Flags","order":21,"path":"folders/Objects/Buttons/Flags.yy",},
     {"name":"Fullscreen","order":17,"path":"folders/Objects/Buttons/Fullscreen.yy",},
     {"name":"General","order":10,"path":"folders/Objects/Buttons/General.yy",},
     {"name":"Leaderboards","order":14,"path":"folders/Objects/Buttons/Leaderboards.yy",},
@@ -27,8 +29,6 @@
     {"name":"Sprites","order":1,"path":"folders/Sprites.yy",},
     {"name":"Tile Sets","order":3,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":15,"path":"folders/Timelines.yy",},
-    {"name":"Events","order":20,"path":"folders/Objects/Buttons/Events.yy",},
-    {"name":"Flags","order":21,"path":"folders/Objects/Buttons/Flags.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"obj_button_getPlayerPhoto","order":5,"path":"objects/obj_button_getPlayerPhoto/obj_button_getPlayerPhoto.yy",},

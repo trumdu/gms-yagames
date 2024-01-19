@@ -9,7 +9,7 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "deviceType":
+			case YaGames_CallDeviceType:
 				// Device Type
                 var _value = async_load[? "value"];
 				switch (_value) {

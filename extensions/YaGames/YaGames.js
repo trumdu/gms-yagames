@@ -1350,7 +1350,7 @@ function YaGamesGMS_Shortcut_CanShowPrompt() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Сan Shortcut requested", req_id);
+		self.browserConsoleLog( "Can Shortcut requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1547,12 +1547,12 @@ function YaGamesGMS_Payments_GetCatalog() {
 		try {
 			self._payments.getCatalog()
 				.then((products) => {
-					self.browserConsoleLog( "Get Сatalog", req_id, products);
-					self.send(req_id, "getСatalog", products);
+					self.browserConsoleLog( "Get Catalog", req_id, products);
+					self.send(req_id, "getCatalog", products);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Get Сatalog error", req_id, err);
-					self.sendError(req_id, "getСatalogError", err);
+					self.browserConsoleLog( "Get Catalog error", req_id, err);
+					self.sendError(req_id, "getCatalogError", err);
 				});
 
 		} catch (err) {

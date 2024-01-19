@@ -9,12 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "playerGetModeRequest":
+            case YaGames_CallPlayerGetMode:
                 // Player mode request success
-                var mode = async_load[? "value"];
+                var _mode = async_load[? "value"];
+				log("Mode: " + _mode);
             break;
 			
-            case "notPlayerInitSDK":
+            case YaGames_CallNotPlayerInitSDK:
                 // Player in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:

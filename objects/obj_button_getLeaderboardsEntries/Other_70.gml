@@ -9,11 +9,23 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "leaderboardsEntries":
+            case YaGames_CallLeaderboardsEntries:
                 // Leaderboard Entries initialization success
-                var lb_data = async_load[? "data"];
+				var _data = json_parse(async_load[? "data"]);
+				log("UserRank: " + string(_data.userRank));
+				// _data.leaderboard.appID
+				// _data.leaderboard.dеfault
+				//_data.leaderboard.name
+				// _data.ranges[0].start
+				// _data.ranges[0].size
+				// _data.entries[0].score
+				// _data.entries[0].extraData
+				// _data.entries[0].rank
+				// _data.entries[0].player.publicName
+				// _data.entries[0].player.uniqueID
+				
             break;
-            case "leaderboardsEntriesError":
+            case YaGames_CallLeaderboardsEntriesError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			
@@ -21,7 +33,7 @@ if (not isMap(async_load)) {
 				
             break;
 			
-            case "notLeaderboardInitSDK":
+            case YaGames_CallNotLeaderboardInitSDK:
                 // Leaderboard in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:

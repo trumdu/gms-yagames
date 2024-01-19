@@ -9,12 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "playerIdRequest":
+            case YaGames_CallPlayerIdRequest:
                 // Player unique ID request success
                 var user_id = async_load[? "value"];
+				log("User Unique ID" + user_id);
             break;
 			
-            case "notPlayerInitSDK":
+            case YaGames_CallNotPlayerInitSDK:
                 // Player in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:

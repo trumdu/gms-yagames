@@ -9,12 +9,12 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "eventDispatch":
+			case YaGames_CallEventDispatch:
 				// Event Dispatch
 				var _event_name = async_load[? "value"];
 				log("Event Dispatch: " + _event_name);
 			break;
-            case "eventDispatchError":
+            case YaGames_CallEventDispatchError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];	

@@ -9,19 +9,18 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "adClosed":
+            case YaGames_CallAdClosed:
                 // The ad is closed
-                var _data = async_load[? "data"];
-				// Has the ad been shown?
-				var _isShown = _data[? "wasShown"];
+				var _data = json_parse(async_load[? "data"]);
+				log("Was shown: " + string(_data.wasShown));
             break;
-            case "adOpened":
+            case YaGames_CallAdOpened:
                 // Advertising is open
             break;
-            case "offlineMode":
+            case YaGames_CallOfflineMode:
                 // The device has lost its connection to the Internet
             break;
-            case "adError":
+            case YaGames_CallAdError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];	

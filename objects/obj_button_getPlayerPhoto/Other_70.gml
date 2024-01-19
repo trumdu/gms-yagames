@@ -9,12 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "playerPhotoRequest":
+            case YaGames_CallPlayerPhotoRequest:
                 // Player Photo request success
-                var user_id = async_load[? "value"];
+                var _photo = async_load[? "value"];
+				log("Photo: " + _photo);
             break;
 			
-            case "notPlayerInitSDK":
+            case YaGames_CallNotPlayerInitSDK:
                 // Player in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:

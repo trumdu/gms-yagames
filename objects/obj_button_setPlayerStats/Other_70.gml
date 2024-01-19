@@ -9,17 +9,17 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "playerSetStats":
+            case YaGames_CallPlayerSetStats:
                 // Player Stats set request success
             break;
-            case "playerSetStatsError":
+            case YaGames_CallPlayerSetStatsError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];	
                 // Stats set request error
             break;
 			
-            case "notPlayerInitSDK":
+            case YaGames_CallNotPlayerInitSDK:
                 // Player in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:

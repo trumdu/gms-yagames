@@ -9,13 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "playerAlreadyLogged":
+			case YaGames_CallPlayerAlreadyLogged:
 				// The player has already been logged in (mode != 'lite')
 			break;
-            case "playerLogged":
+            case YaGames_CallPlayerLogged:
                 // The player has successfully logged in
             break;
-            case "playerLoggedError":
+            case YaGames_CallPlayerLoggedError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			

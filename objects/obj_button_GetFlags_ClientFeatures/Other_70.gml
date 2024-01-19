@@ -9,13 +9,13 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case "getFlags":
+			case YaGames_CallGetFlags:
 				// Get Flags
 				var _data = json_parse(async_load[? "data"]);
 				log("Test1: " + string(_data.test1));
 				log("Difficult: " + string(_data.test2));
 			break;
-            case "getFlagsError":
+            case YaGames_CallGetFlagsError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];	

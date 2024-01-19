@@ -9,18 +9,17 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "leaderboardsSetScore":
+            case YaGames_CallLeaderboardsSetScore:
                 // Leaderboard score set success
-                var lb_data = async_load[? "data"];
             break;
-            case "leaderboardsSetScoreError":
+            case YaGames_CallLeaderboardsSetScoreError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			
                 // Leaderboard score set error
             break;
 			
-            case "notLeaderboardInitSDK":
+            case YaGames_CallNotLeaderboardInitSDK:
                 // Leaderboard in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:

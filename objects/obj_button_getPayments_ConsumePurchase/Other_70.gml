@@ -9,10 +9,10 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case "consumePurchase":
+            case YaGames_CallConsumePurchase:
                 // Consume Purchase success
             break;
-            case "consumePurchaseError":
+            case YaGames_CallConsumePurchaseError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			
@@ -20,7 +20,7 @@ if (not isMap(async_load)) {
 				
             break;
 			
-            case "notPaymentsInitSDK":
+            case YaGames_CallNotPaymentsInitSDK:
                 // Payments in SDK not initialized
             break;
             case YaGames_CallNotInitSDK:
