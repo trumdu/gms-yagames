@@ -276,7 +276,7 @@
   "gradleinject": "",
   "hasConvertedCodeInjection": true,
   "helpfile": "",
-  "HTML5CodeInjection": "<GM_HTML5_PostStyle>\r\n<style>\r\n    body\r\n    {\r\n        overflow:hidden;\r\n    }\r\n</style>\r\n</GM_HTML5_PostStyle>\r\n\r\n<GM_HTML5_PreBody>\r\n\t<script>\r\n\t\tvar YaGames_send_game_start = \"${YYEXTOPT_YaGames_send_game_start}\".toLowerCase() == \"true\";\r\n\t</script>\r\n</GM_HTML5_PreBody>",
+  "HTML5CodeInjection": "<GM_HTML5_PostStyle>\r\n<style>\r\n\t\t\tbody\r\n\t\t\t{\r\n\t\t\t\toverflow:hidden;\r\n\t\t\t}\r\n\t\t</style>\r\n</GM_HTML5_PostStyle>\r\n\r\n<GM_HTML5_PreBody>\r\n\t<script>\r\n\t\tvar YaGames_send_game_start = \"${YYEXTOPT_YaGames_send_game_start}\".toLowerCase() == \"true\";\r\n\t\t// Remove the input lag (when the click does not always count)\r\n\t\tdocument.addEventListener('touchstart', e => { e.preventDefault(); }, { passive: false })\r\n\t</script>\r\n</GM_HTML5_PreBody>",
   "html5Props": true,
   "IncludedResources": [],
   "installdir": "",
