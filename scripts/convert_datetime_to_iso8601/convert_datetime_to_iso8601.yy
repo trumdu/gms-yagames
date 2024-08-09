@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"convert_datetime_to_iso8601",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"convert_datetime_to_iso8601",
+  "parent":{
+    "name":"ISO8601",
+    "path":"folders/Scripts/ISO8601.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

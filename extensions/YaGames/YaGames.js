@@ -3,7 +3,7 @@
 	console.log('Yandex SDK start load script');
 	let t = d.getElementsByTagName('script')[0];
 	let s = d.createElement('script');
-	s.src = 'https://yandex.ru/games/sdk/v2';
+	s.src = YaGames_sdk_src;
 	s.async = true;
 	t.parentNode.insertBefore(s, t);
 	s.onload = YaGamesGMS_SdkInit;
@@ -301,6 +301,77 @@ function YaGamesGMS_GameReadyOn() {
 		}
 	}, 0);
 	return req_id;
+}
+
+/**
+ * Sending a message that the gameplay start
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_GameplayStart() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Gameplay Start request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.browserConsoleLog( "Yandex SDK Gameplay Start", req_id);
+			self._ysdk.features.GameplayAPI?.start();
+			self.send(req_id, "gameplayStart");
+		} catch (err) {
+			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err)
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Sending a message that the gameplay stop
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_GameplayStop() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Gameplay Stop request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.browserConsoleLog( "Yandex SDK Gameplay Stop", req_id);
+			self._ysdk.features.GameplayAPI?.stop();
+			self.send(req_id, "gameplayStop");
+		} catch (err) {
+			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err)
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get Server Time
+ * @returns {number} timestamp
+ */
+function YaGamesGMS_GetServerTime() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	if (!self.getInitStatus()) {
+		self.sendSdkNotInitStatus(req_id);
+	}
+	else {
+		try {
+			return self._ysdk.serverTime();
+		} catch (err) {
+			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err)
+		}
+	}
+	return 0;
 }
 
 /**

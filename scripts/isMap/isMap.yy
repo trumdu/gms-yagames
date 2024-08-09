@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "isMap",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "GM Fixes and Tweaks",
-    "path": "folders/Scripts/GM Fixes and Tweaks.yy",
+  "$GMScript":"",
+  "%Name":"isMap",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"isMap",
+  "parent":{
+    "name":"GM Fixes and Tweaks",
+    "path":"folders/Scripts/GM Fixes and Tweaks.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }
