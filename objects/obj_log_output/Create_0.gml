@@ -26,3 +26,15 @@ add_log = function(str) {
 log_clear = function() {
 	ds_list_clear(log_list);	
 }
+
+try {
+	var _ver = extension_get_version("YaGames");
+	add_log($"Extension Version: {_ver}");
+}
+catch (_exception) {
+	add_log("Error getting the extension version. Check that the extension is called YaGames.");
+    show_debug_message(_exception.message);
+    show_debug_message(_exception.longMessage);
+    show_debug_message(_exception.script);
+    show_debug_message(_exception.stacktrace);
+}

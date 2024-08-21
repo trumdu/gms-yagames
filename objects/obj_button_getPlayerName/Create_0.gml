@@ -1,4 +1,3 @@
 event_inherited();
-text += @"Player
-init";
+text += @"Get Name";
 msg = -1;

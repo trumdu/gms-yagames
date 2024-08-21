@@ -1057,9 +1057,15 @@ function YaGamesGML_Player_GetSignature() {
 		}
 		try {
 			/// GetPlayer must be called with signature enabled
-			let signature = self._player.signature;
-			self.browserConsoleLog( "Player Signature requested", req_id, signature);
-			self.send(req_id, "playerGetSignatureRequest", signature);
+			if ("signature" in self._player) {
+				let signature = self._player.signature;
+				self.browserConsoleLog( "Player Signature requested", req_id, signature);
+				self.send(req_id, "playerGetSignatureRequest", signature);
+			}
+			else {
+				self.browserConsoleLog( "Player Signature not initialized", req_id);
+				self.send(req_id, "playerGetSignatureNotInitialized");
+			}
 		} catch (err) {
 			self.browserConsoleLog( "Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);

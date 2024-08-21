@@ -9,21 +9,20 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case YaGames_CallPaymentsInit:
-                // Payments initialization success
-				with (obj_childrenPayments_parent) {
-					is_disabled = false;	
-				}
-				is_disabled = true;
+            case YaGames_CallPlayerSignatureRequest:
+                // Player signature request success
+                var _signature = async_load[? "value"];
+				log("Signature: " + _signature);
             break;
-            case YaGames_CallPaymentsInitError:
-                var errCode = async_load[? "code"];
-                var errName = async_load[? "name"];
-                var errMessage = async_load[? "message"];			
-                // Payments initialization error
-				
-            break;
+			case YaGames_CallPlayerSignatureNotInitialized:
+                // Error get the player's signature
+				log("The player does not contain a signature.");
+				log("Check that the initialization was completed with the signature.");
+			break;
 			
+            case YaGames_CallNotPlayerInitSDK:
+                // Player in SDK not initialized
+            break;
             case YaGames_CallNotInitSDK:
                 // SDK not initialized
             break;

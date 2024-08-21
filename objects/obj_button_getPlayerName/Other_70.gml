@@ -9,21 +9,15 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case YaGames_CallPaymentsInit:
-                // Payments initialization success
-				with (obj_childrenPayments_parent) {
-					is_disabled = false;	
-				}
-				is_disabled = true;
-            break;
-            case YaGames_CallPaymentsInitError:
-                var errCode = async_load[? "code"];
-                var errName = async_load[? "name"];
-                var errMessage = async_load[? "message"];			
-                // Payments initialization error
-				
+            case YaGames_CallPlayerNameRequest:
+                // Player name request success
+                var _name = async_load[? "value"];
+				log("Name: " + _name);
             break;
 			
+            case YaGames_CallNotPlayerInitSDK:
+                // Player in SDK not initialized
+            break;
             case YaGames_CallNotInitSDK:
                 // SDK not initialized
             break;
