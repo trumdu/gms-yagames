@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"convert_iso8601_to_datetime",
   "isCompatibility":false,
   "isDnD":false,

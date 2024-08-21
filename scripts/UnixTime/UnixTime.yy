@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"UnixTime",
   "isCompatibility":false,
   "isDnD":false,

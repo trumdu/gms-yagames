@@ -879,9 +879,10 @@ function YaGamesGML_Leaderboards_setScore(leaderboard_name, score, extra_data) {
 /**
  * Player object Initialization
  * @param scopes Include name and avatar. The user will see a dialog box asking for access. If the user refuses to grant access, you will only receive their ID.
+ * @param signature Include signature for external authorization. (https://yandex.ru/dev/games/doc/ru/sdk/sdk-purchases#signature)
  * @returns {Number} Request ID
  */
-function YaGamesGML_Player_Init(scopes = 0) {
+function YaGamesGML_Player_Init(scopes = 0, signature = 0) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
@@ -896,7 +897,7 @@ function YaGamesGML_Player_Init(scopes = 0) {
 			return;
 		}
 		try {
-			self._ysdk.getPlayer((scopes > 0))
+			self._ysdk.getPlayer({ scopes: scopes > 0, signed: signature > 0 })
 				.then((player) => {
 					self._player = player;
 					self.browserConsoleLog( "Player was initialized", req_id);
@@ -1000,6 +1001,65 @@ function YaGamesGML_Player_GetPhoto(avatarSize) {
 			let cname = self._player.getPhoto(avatarSize);
 			self.browserConsoleLog( "Player Photo requested", req_id, cname);
 			self.send(req_id, "playerPhotoRequest", cname);
+		} catch (err) {
+			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get user name
+ * @returns {Number} Request ID
+ */
+function YaGamesGML_Player_GetName() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Name requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		if (!self.getPlayerInitStatus()) {
+			self.sendPlayerNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let name = self._player.getName();
+			self.browserConsoleLog( "Player Name requested", req_id, name);
+			self.send(req_id, "playerGetNameRequest", name);
+		} catch (err) {
+			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get user signature
+ * @returns {Number} Request ID
+ */
+function YaGamesGML_Player_GetSignature() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog( "Player Signature requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		if (!self.getPlayerInitStatus()) {
+			self.sendPlayerNotInitStatus(req_id);
+			return;
+		}
+		try {
+			/// GetPlayer must be called with signature enabled
+			let signature = self._player.signature;
+			self.browserConsoleLog( "Player Signature requested", req_id, signature);
+			self.send(req_id, "playerGetSignatureRequest", signature);
 		} catch (err) {
 			self.browserConsoleLog( "Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);

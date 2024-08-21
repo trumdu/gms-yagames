@@ -33,7 +33,7 @@
     {"name":"Timelines","order":15,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings":[
-    {"name":"browser_hdpi","order":1,"path":"extensions/browser_hdpi/browser_hdpi.yy",},
+    {"name":"YaGames","order":1,"path":"extensions/YaGames/YaGames.yy",},
     {"name":"fnt_header","order":1,"path":"fonts/fnt_header/fnt_header.yy",},
     {"name":"obj_button_banner_getAdvStatus","order":2,"path":"objects/obj_button_banner_getAdvStatus/obj_button_banner_getAdvStatus.yy",},
     {"name":"obj_button_banner_hideAdv","order":4,"path":"objects/obj_button_banner_hideAdv/obj_button_banner_hideAdv.yy",},
