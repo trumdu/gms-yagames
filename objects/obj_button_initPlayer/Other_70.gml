@@ -14,6 +14,7 @@ if (not isMap(async_load)) {
 				with (obj_childrenPlayer_parent) {
 					is_disabled = false;	
 				}
+				is_disabled = true;
             break;
             case YaGames_CallPlayerInitError:
                 var errCode = async_load[? "code"];

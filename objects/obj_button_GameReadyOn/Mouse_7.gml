@@ -3,3 +3,4 @@ if (is_clicked) {
 	var msg = "GameReadyOn reqId: " + string(req_id);
     log(msg);
 };
+

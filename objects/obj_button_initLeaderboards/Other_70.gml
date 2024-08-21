@@ -14,6 +14,7 @@ if (not isMap(async_load)) {
 				with (obj_childrenLeaderboards_parent) {
 					is_disabled = false;	
 				}
+				is_disabled = true;
             break;
             case YaGames_CallLeaderboardsInitError:
                 var errCode = async_load[? "code"];

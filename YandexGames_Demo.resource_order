@@ -33,7 +33,7 @@
     {"name":"Timelines","order":15,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings":[
-    {"name":"browser_hdpi","order":1,"path":"extensions/browser_hdpi/browser_hdpi.yy",},
+    {"name":"YaGames","order":1,"path":"extensions/YaGames/YaGames.yy",},
     {"name":"fnt_header","order":1,"path":"fonts/fnt_header/fnt_header.yy",},
     {"name":"obj_button_banner_getAdvStatus","order":2,"path":"objects/obj_button_banner_getAdvStatus/obj_button_banner_getAdvStatus.yy",},
     {"name":"obj_button_banner_hideAdv","order":4,"path":"objects/obj_button_banner_hideAdv/obj_button_banner_hideAdv.yy",},
@@ -63,7 +63,9 @@
     {"name":"obj_button_getPlayerData","order":6,"path":"objects/obj_button_getPlayerData/obj_button_getPlayerData.yy",},
     {"name":"obj_button_getPlayerIDsPerGame","order":4,"path":"objects/obj_button_getPlayerIDsPerGame/obj_button_getPlayerIDsPerGame.yy",},
     {"name":"obj_button_getPlayerMode","order":13,"path":"objects/obj_button_getPlayerMode/obj_button_getPlayerMode.yy",},
+    {"name":"obj_button_getPlayerName","order":14,"path":"objects/obj_button_getPlayerName/obj_button_getPlayerName.yy",},
     {"name":"obj_button_getPlayerPhoto","order":5,"path":"objects/obj_button_getPlayerPhoto/obj_button_getPlayerPhoto.yy",},
+    {"name":"obj_button_getPlayerSignature","order":15,"path":"objects/obj_button_getPlayerSignature/obj_button_getPlayerSignature.yy",},
     {"name":"obj_button_getPlayerStats","order":10,"path":"objects/obj_button_getPlayerStats/obj_button_getPlayerStats.yy",},
     {"name":"obj_button_getPlayerUniqueID","order":3,"path":"objects/obj_button_getPlayerUniqueID/obj_button_getPlayerUniqueID.yy",},
     {"name":"obj_button_getServerTime","order":7,"path":"objects/obj_button_getServerTime/obj_button_getServerTime.yy",},

@@ -1,4 +1,4 @@
 event_inherited();
-text += @"Player
-init";
+text += @"Get
+Signature";
 msg = -1;
