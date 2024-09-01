@@ -84,6 +84,7 @@
     {"name":"obj_button_showRewardVideo","order":1,"path":"objects/obj_button_showRewardVideo/obj_button_showRewardVideo.yy",},
     {"name":"obj_childrenLeaderboards_parent","order":1,"path":"objects/obj_childrenLeaderboards_parent/obj_childrenLeaderboards_parent.yy",},
     {"name":"obj_childrenPlayer_parent","order":1,"path":"objects/obj_childrenPlayer_parent/obj_childrenPlayer_parent.yy",},
+    {"name":"obj_game_init","order":7,"path":"objects/obj_game_init/obj_game_init.yy",},
     {"name":"obj_header_advertisement","order":1,"path":"objects/obj_header_advertisement/obj_header_advertisement.yy",},
     {"name":"obj_header_device_info","order":4,"path":"objects/obj_header_device_info/obj_header_device_info.yy",},
     {"name":"obj_header_feedback","order":6,"path":"objects/obj_header_feedback/obj_header_feedback.yy",},
@@ -100,6 +101,7 @@
     {"name":"obj_log_output","order":4,"path":"objects/obj_log_output/obj_log_output.yy",},
     {"name":"obj_web_game_resize","order":6,"path":"objects/obj_web_game_resize/obj_web_game_resize.yy",},
     {"name":"room_demo","order":1,"path":"rooms/room_demo/room_demo.yy",},
+    {"name":"room_init","order":2,"path":"rooms/room_init/room_init.yy",},
     {"name":"clear_log","order":3,"path":"scripts/clear_log/clear_log.yy",},
     {"name":"convert_iso8601_to_datetime","order":1,"path":"scripts/convert_iso8601_to_datetime/convert_iso8601_to_datetime.yy",},
     {"name":"get_logs","order":2,"path":"scripts/get_logs/get_logs.yy",},
@@ -109,6 +111,7 @@
     {"name":"spr_button_short","order":3,"path":"sprites/spr_button_short/spr_button_short.yy",},
     {"name":"spr_button","order":1,"path":"sprites/spr_button/spr_button.yy",},
     {"name":"spr_head_text","order":6,"path":"sprites/spr_head_text/spr_head_text.yy",},
+    {"name":"spr_loading","order":7,"path":"sprites/spr_loading/spr_loading.yy",},
     {"name":"spr_temp","order":5,"path":"sprites/spr_temp/spr_temp.yy",},
   ],
 }

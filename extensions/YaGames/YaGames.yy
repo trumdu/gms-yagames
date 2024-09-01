@@ -14,7 +14,7 @@
   "copyToTargets":32,
   "description":"",
   "exportToGame":true,
-  "extensionVersion":"1.0.10",
+  "extensionVersion":"1.0.12",
   "files":[
     {"$GMExtensionFile":"","%Name":"","constants":[
         {"$GMExtensionConstant":"","%Name":"YaGames_DeviceMobile","hidden":false,"name":"YaGames_DeviceMobile","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"mobile\"",},
