@@ -46,7 +46,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.6.2.162",
+    "IDEVersion":"2024.8.1.171",
   },
   "name":"YandexGames_Demo",
   "resources":[
@@ -61,11 +61,11 @@
     {"id":{"name":"obj_button_EventDispatch","path":"objects/obj_button_EventDispatch/obj_button_EventDispatch.yy",},},
     {"id":{"name":"obj_button_EventOn","path":"objects/obj_button_EventOn/obj_button_EventOn.yy",},},
     {"id":{"name":"obj_button_exutFullscreen","path":"objects/obj_button_exutFullscreen/obj_button_exutFullscreen.yy",},},
+    {"id":{"name":"obj_button_GameApiPauseAndResume","path":"objects/obj_button_GameApiPauseAndResume/obj_button_GameApiPauseAndResume.yy",},},
     {"id":{"name":"obj_button_GameplayStart","path":"objects/obj_button_GameplayStart/obj_button_GameplayStart.yy",},},
     {"id":{"name":"obj_button_GameplayStop","path":"objects/obj_button_GameplayStop/obj_button_GameplayStop.yy",},},
     {"id":{"name":"obj_button_GameReadyOn","path":"objects/obj_button_GameReadyOn/obj_button_GameReadyOn.yy",},},
     {"id":{"name":"obj_button_GetAllFlags","path":"objects/obj_button_GetAllFlags/obj_button_GetAllFlags.yy",},},
-    {"id":{"name":"obj_button_getBrowserLang","path":"objects/obj_button_getBrowserLang/obj_button_getBrowserLang.yy",},},
     {"id":{"name":"obj_button_getDeviceType","path":"objects/obj_button_getDeviceType/obj_button_getDeviceType.yy",},},
     {"id":{"name":"obj_button_getEnvironment","path":"objects/obj_button_getEnvironment/obj_button_getEnvironment.yy",},},
     {"id":{"name":"obj_button_getFeedbackCanReview","path":"objects/obj_button_getFeedbackCanReview/obj_button_getFeedbackCanReview.yy",},},

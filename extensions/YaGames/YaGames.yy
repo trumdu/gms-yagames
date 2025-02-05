@@ -14,7 +14,7 @@
   "copyToTargets":32,
   "description":"",
   "exportToGame":true,
-  "extensionVersion":"1.0.12",
+  "extensionVersion":"1.0.13",
   "files":[
     {"$GMExtensionFile":"","%Name":"","constants":[
         {"$GMExtensionConstant":"","%Name":"YaGames_DeviceMobile","hidden":false,"name":"YaGames_DeviceMobile","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"mobile\"",},
@@ -118,6 +118,9 @@
         {"$GMExtensionConstant":"","%Name":"YaGames_CallPlayerSignatureRequest","hidden":false,"name":"YaGames_CallPlayerSignatureRequest","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"playerGetSignatureRequest\"",},
         {"$GMExtensionConstant":"","%Name":"YaGames_CallPlayerNameRequest","hidden":false,"name":"YaGames_CallPlayerNameRequest","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"playerGetNameRequest\"",},
         {"$GMExtensionConstant":"","%Name":"YaGames_CallPlayerSignatureNotInitialized","hidden":false,"name":"YaGames_CallPlayerSignatureNotInitialized","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"playerGetSignatureNotInitialized\"",},
+        {"$GMExtensionConstant":"","%Name":"YaGames_CallGameApiResume","hidden":false,"name":"YaGames_CallGameApiResume","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"gameApiResume\"",},
+        {"$GMExtensionConstant":"","%Name":"YaGames_CallGameApiPause","hidden":false,"name":"YaGames_CallGameApiPause","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"gameApiPause\"",},
+        {"$GMExtensionConstant":"","%Name":"YaGames_RequestIdGameApi","hidden":false,"name":"YaGames_RequestIdGameApi","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"42",},
       ],"copyToTargets":144115188075855904,"filename":"YaGames.js","final":"","functions":[
         {"$GMExtensionFunction":"","%Name":"YaGames_getInitStatus","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_getInitStatus","help":"YaGames_getInitStatus()","hidden":false,"kind":5,"name":"YaGames_getInitStatus","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
         {"$GMExtensionFunction":"","%Name":"YaGames_setDebugMode","argCount":0,"args":[2,],"documentation":"","externalName":"YaGamesGMS_setDebugMode","help":"YaGames_setDebugMode( enable (1) / disable (0) )","hidden":false,"kind":5,"name":"YaGames_setDebugMode","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},

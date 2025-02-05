@@ -1,16 +1,16 @@
 {
   "$GMObject":"",
-  "%Name":"obj_button_getBrowserLang",
+  "%Name":"obj_button_GameApiPauseAndResume",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":7,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":70,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"obj_button_getBrowserLang",
+  "name":"obj_button_GameApiPauseAndResume",
   "overriddenProperties":[],
   "parent":{
-    "name":"General",
-    "path":"folders/Objects/Buttons/General.yy",
+    "name":"Gameplay",
+    "path":"folders/Objects/Buttons/Gameplay.yy",
   },
   "parentObjectId":{
     "name":"obj_button_parent",
@@ -34,8 +34,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_button_short",
-    "path":"sprites/spr_button_short/spr_button_short.yy",
+    "name":"spr_button_long",
+    "path":"sprites/spr_button_long/spr_button_long.yy",
   },
   "spriteMaskId":null,
   "visible":true,

@@ -1,5 +1,5 @@
 // Async Yandex Games SDK 2 
-(function(d) {
+(function (d) {
 	console.log('Yandex SDK start load script');
 	let t = d.getElementsByTagName('script')[0];
 	let s = d.createElement('script');
@@ -12,7 +12,8 @@
 var YaGamesGMS = {
 	_mapTypeDesc: "YaGames",
 	_allowConsoleDebug: false,
-	_request_id: 0,
+	_request_id: 100,
+	_game_api_request_id: 42,
 	_ysdk: null,
 	_lb: null,
 	_player: null,
@@ -32,7 +33,7 @@ var YaGamesGMS = {
 	 @param request_id {number} Request ID
 	 @param data Event data
 	 */
-	browserConsoleLog: function (message, request_id= -1, data = null) {
+	browserConsoleLog: function (message, request_id = -1, data = null) {
 		if (YaGamesGMS._allowConsoleDebug) {
 			if (data) {
 				if (data instanceof Error) {
@@ -42,12 +43,12 @@ var YaGamesGMS = {
 					message += " | " + JSON.stringify(data);
 				}
 			}
-
+			var d = new Date();
 			if (request_id >= 0) {
-				console.log("Request " + request_id + ": " + message);
+				console.log(d.toLocaleTimeString() + " Request " + request_id + ": " + message);
 			}
 			else {
-				console.log(message);
+				console.log(d.toLocaleTimeString() + " " + message);
 			}
 		}
 	},
@@ -141,7 +142,7 @@ var YaGamesGMS = {
 	 */
 	sendSdkNotInitStatus: function (request_id) {
 		let self = YaGamesGMS;
-		self.browserConsoleLog( "notInitSDK", request_id, "SDK not Initialized");
+		self.browserConsoleLog("notInitSDK", request_id, "SDK not Initialized");
 		self.send(request_id, "notInitSDK", "SDK not Initialized");
 	},
 	/**
@@ -149,7 +150,7 @@ var YaGamesGMS = {
 	 */
 	sendLeaderboardNotInitStatus: function (request_id) {
 		let self = YaGamesGMS;
-		self.browserConsoleLog( "notLeaderboardInitSDK", request_id, "Leaderboard not Initialized");
+		self.browserConsoleLog("notLeaderboardInitSDK", request_id, "Leaderboard not Initialized");
 		self.send(request_id, "notLeaderboardInitSDK", "Leaderboard not Initialized");
 	},
 	/**
@@ -157,7 +158,7 @@ var YaGamesGMS = {
 	 */
 	sendPlayerNotInitStatus: function (request_id) {
 		let self = YaGamesGMS;
-		self.browserConsoleLog( "notPlayerInitSDK", request_id, "Player not Initialized");
+		self.browserConsoleLog("notPlayerInitSDK", request_id, "Player not Initialized");
 		self.send(request_id, "notPlayerInitSDK", "Player not Initialized");
 	},
 	/**
@@ -165,7 +166,7 @@ var YaGamesGMS = {
 	 */
 	sendPaymentsNotInitStatus: function (request_id) {
 		let self = YaGamesGMS;
-		self.browserConsoleLog( "notPaymentsInitSDK", request_id, "Payments not Initialized");
+		self.browserConsoleLog("notPaymentsInitSDK", request_id, "Payments not Initialized");
 		self.send(request_id, "notPaymentsInitSDK", "Payments not Initialized");
 	},
 	/**
@@ -211,10 +212,18 @@ function YaGamesGMS_SdkInit() {
 		console.log('Yandex SDK initialized');
 		self._ysdk = ysdk;
 		// We show the SDK that the game has loaded and you can start playing.
-		if (YaGames_send_game_start)
-		{
+		if (YaGames_send_game_start) {
 			self._ysdk.features.LoadingAPI?.ready();
 		}
+		// Subscribing to pause events
+		self._ysdk.on('game_api_resume', () => {
+			self.send(self._game_api_request_id, "gameApiResume");
+			self.browserConsoleLog("Yandex SDK GameResume", self._game_api_request_id);
+		});
+		self._ysdk.on('game_api_pause', () => {
+			self.send(self._game_api_request_id, "gameApiPause");
+			self.browserConsoleLog("Yandex SDK GamePause", self._game_api_request_id);
+		});
 	});
 }
 
@@ -258,7 +267,7 @@ function YaGamesGMS_getInitStatus() {
  */
 function YaGamesGML_getBrowserLang() {
 	let brLang = navigator.language || navigator.userLanguage;
-	YaGamesGMS.browserConsoleLog( "Browser priority language: " + brLang);
+	YaGamesGMS.browserConsoleLog("Browser priority language: " + brLang);
 	return brLang;
 }
 
@@ -266,7 +275,7 @@ function YaGamesGML_getBrowserLang() {
  * Reloading the browser page
  */
 function YaGamesGML_pageReload() {
-	YaGamesGMS.browserConsoleLog( "Reloading the browser page");
+	YaGamesGMS.browserConsoleLog("Reloading the browser page");
 	window.location.reload();
 }
 
@@ -286,17 +295,17 @@ function YaGamesGMS_GameReadyOn() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "GameReady request", req_id);
+		self.browserConsoleLog("GameReady request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
-			self.browserConsoleLog( "Yandex SDK GameReady", req_id);
+			self.browserConsoleLog("Yandex SDK GameReady", req_id);
 			self._ysdk.features.LoadingAPI?.ready();
 			self.send(req_id, "gameReady");
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -311,17 +320,17 @@ function YaGamesGMS_GameplayStart() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Gameplay Start request", req_id);
+		self.browserConsoleLog("Gameplay Start request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
-			self.browserConsoleLog( "Yandex SDK Gameplay Start", req_id);
+			self.browserConsoleLog("Yandex SDK Gameplay Start", req_id);
 			self._ysdk.features.GameplayAPI?.start();
 			self.send(req_id, "gameplayStart");
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -336,17 +345,17 @@ function YaGamesGMS_GameplayStop() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Gameplay Stop request", req_id);
+		self.browserConsoleLog("Gameplay Stop request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
-			self.browserConsoleLog( "Yandex SDK Gameplay Stop", req_id);
+			self.browserConsoleLog("Yandex SDK Gameplay Stop", req_id);
 			self._ysdk.features.GameplayAPI?.stop();
 			self.send(req_id, "gameplayStop");
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -367,7 +376,7 @@ function YaGamesGMS_GetServerTime() {
 		try {
 			return self._ysdk.serverTime();
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}
@@ -382,7 +391,7 @@ function YaGamesGMS_showFullscreenAdv() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "FullScreen Ads requested", req_id);
+		self.browserConsoleLog("FullScreen Ads requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -393,25 +402,25 @@ function YaGamesGMS_showFullscreenAdv() {
 					onClose: (wasShown) => {
 						let map = {};
 						map["wasShown"] = wasShown;
-						self.browserConsoleLog( "FullScreen Ads closed", req_id, map);
+						self.browserConsoleLog("FullScreen Ads closed", req_id, map);
 						self.send(req_id, "adClosed", map);
 					},
 					onOpen: () => {
-						self.browserConsoleLog( "FullScreen Ads opened", req_id);
+						self.browserConsoleLog("FullScreen Ads opened", req_id);
 						self.send(req_id, "adOpened");
 					},
 					onOffline: () => {
-						self.browserConsoleLog( "FullScreen Ads. Offline mode", req_id);
+						self.browserConsoleLog("FullScreen Ads. Offline mode", req_id);
 						self.send(req_id, "offlineMode");
 					},
 					onError: (err) => {
-						self.browserConsoleLog( "Failed FullScreen Ads show", req_id, err);
+						self.browserConsoleLog("Failed FullScreen Ads show", req_id, err);
 						self.sendError(req_id, "adError", err);
 					},
 				},
 			});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -426,7 +435,7 @@ function YaGamesGMS_showRewardedVideo() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "FullScreen ad requested", req_id);
+		self.browserConsoleLog("FullScreen ad requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -435,25 +444,25 @@ function YaGamesGMS_showRewardedVideo() {
 			self._ysdk.adv.showRewardedVideo({
 				callbacks: {
 					onOpen: () => {
-						self.browserConsoleLog( "Reward ad opened.", req_id);
+						self.browserConsoleLog("Reward ad opened.", req_id);
 						self.send(req_id, "rewardOpened");
 					},
 					onRewarded: () => {
-						self.browserConsoleLog( "Rewarded!", req_id);
+						self.browserConsoleLog("Rewarded!", req_id);
 						self.send(req_id, "rewardReceived");
 					},
 					onClose: () => {
-						self.browserConsoleLog( "Reward ad closed.", req_id);
+						self.browserConsoleLog("Reward ad closed.", req_id);
 						self.send(req_id, "rewardClosed");
 					},
 					onError: (err) => {
-						self.browserConsoleLog( "Reward ad show failed", req_id, err);
+						self.browserConsoleLog("Reward ad show failed", req_id, err);
 						self.sendError(req_id, "rewardError", err);
 					},
 				},
 			});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -464,33 +473,33 @@ function YaGamesGMS_showRewardedVideo() {
  * Get the banner status
  * @returns {Number} Request ID
  */
- function YaGamesGML_Banner_getAdvStatus() {
+function YaGamesGML_Banner_getAdvStatus() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Banner status request", req_id);
+		self.browserConsoleLog("Banner status request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
 			self._ysdk.adv.getBannerAdvStatus()
-			.then(({ result }) => {
-				if (result) {
-					self.browserConsoleLog( "Banner is showing.", req_id);
-					self.send(req_id, "bannerShowing");
-				} else {
-					self.browserConsoleLog( "Banner is hidden.", req_id);
-					self.send(req_id, "bannerHidden");
-				}
-			})
-			.catch((err) => {
-				self.browserConsoleLog( "Get Banner status error", req_id, err);
-				self.sendError(req_id, "getBannerStatusError", err);
-			});
+				.then(({ result }) => {
+					if (result) {
+						self.browserConsoleLog("Banner is showing.", req_id);
+						self.send(req_id, "bannerShowing");
+					} else {
+						self.browserConsoleLog("Banner is hidden.", req_id);
+						self.send(req_id, "bannerHidden");
+					}
+				})
+				.catch((err) => {
+					self.browserConsoleLog("Get Banner status error", req_id, err);
+					self.sendError(req_id, "getBannerStatusError", err);
+				});
 
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -505,29 +514,29 @@ function YaGamesGML_Banner_ShowAdv() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Banner show request", req_id);
+		self.browserConsoleLog("Banner show request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
 			self._ysdk.adv.showBannerAdv()
-			.then(({ result , reason }) => {
-				if (result) {
-					self.browserConsoleLog( "Banner shown.", req_id);
-					self.send(req_id, "bannerShown");
-				} else {
-					self.browserConsoleLog( "Banner not shown.", req_id, reason);
-					self.send(req_id, "bannerNotShown", reason);
-				}
-			})
-			.catch((err) => {
-				self.browserConsoleLog( "Banner show error", req_id, err);
-				self.sendError(req_id, "bannerShowError", err);
-			});
+				.then(({ result, reason }) => {
+					if (result) {
+						self.browserConsoleLog("Banner shown.", req_id);
+						self.send(req_id, "bannerShown");
+					} else {
+						self.browserConsoleLog("Banner not shown.", req_id, reason);
+						self.send(req_id, "bannerNotShown", reason);
+					}
+				})
+				.catch((err) => {
+					self.browserConsoleLog("Banner show error", req_id, err);
+					self.sendError(req_id, "bannerShowError", err);
+				});
 
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -542,24 +551,24 @@ function YaGamesGML_Banner_HideAdv() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Banner hide request", req_id);
+		self.browserConsoleLog("Banner hide request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
 			self._ysdk.adv.hideBannerAdv()
-			.then((result) => {
-				self.browserConsoleLog( "Banner hidden", req_id, result);
-				self.send(req_id, "bannerHidden", result);
-			})
-			.catch((err) => {
-				self.browserConsoleLog( "Banner hide error", req_id, err);
-				self.sendError(req_id, "bannerHideError", err);
-			});
+				.then((result) => {
+					self.browserConsoleLog("Banner hidden", req_id, result);
+					self.send(req_id, "bannerHidden", result);
+				})
+				.catch((err) => {
+					self.browserConsoleLog("Banner hide error", req_id, err);
+					self.sendError(req_id, "bannerHideError", err);
+				});
 
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -575,7 +584,7 @@ function YaGamesGML_setToClipboard(text) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Clipboard request", req_id);
+		self.browserConsoleLog("Clipboard request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -583,15 +592,15 @@ function YaGamesGML_setToClipboard(text) {
 		try {
 			self._ysdk.clipboard.writeText(text)
 				.then(() => {
-					self.browserConsoleLog( "Text copied to clipboard", req_id, text);
+					self.browserConsoleLog("Text copied to clipboard", req_id, text);
 					self.send(req_id, "clipboardSuccess");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Failed FullScreen Ads show", req_id, err);
+					self.browserConsoleLog("Failed FullScreen Ads show", req_id, err);
 					self.sendError(req_id, "clipboardError", err)
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -606,17 +615,17 @@ function YaGamesGML_DeviceInfo_getType() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Device type request", req_id);
+		self.browserConsoleLog("Device type request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
 			let dev_type = self._ysdk.deviceInfo.type;
-			self.browserConsoleLog( "Device type", req_id, dev_type);
+			self.browserConsoleLog("Device type", req_id, dev_type);
 			self.send(req_id, "deviceType", dev_type);
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -631,17 +640,17 @@ function YaGamesGML_getEnvironment() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Environment request", req_id);
+		self.browserConsoleLog("Environment request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
 			let envDt = self._ysdk.environment;
-			self.browserConsoleLog( "Environment", req_id, envDt);
+			self.browserConsoleLog("Environment", req_id, envDt);
 			self.send(req_id, "environment", envDt);
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -656,13 +665,13 @@ function YaGamesGML_Leaderboards_Init() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Leaderboard init requested", req_id);
+		self.browserConsoleLog("Leaderboard init requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		if (self.getLeaderboardInitStatus()) {
-			self.browserConsoleLog( "Leaderboard was initialized", req_id);
+			self.browserConsoleLog("Leaderboard was initialized", req_id);
 			self.send(req_id, "leaderboardsInit");
 			return;
 		}
@@ -670,15 +679,15 @@ function YaGamesGML_Leaderboards_Init() {
 			self._ysdk.getLeaderboards()
 				.then((lb) => {
 					self._lb = lb;
-					self.browserConsoleLog( "Leaderboard was initialized", req_id);
+					self.browserConsoleLog("Leaderboard was initialized", req_id);
 					self.send(req_id, "leaderboardsInit");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Leaderboards init error", req_id, err);
+					self.browserConsoleLog("Leaderboards init error", req_id, err);
 					self.sendError(req_id, "leaderboardsInitError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -694,7 +703,7 @@ function YaGamesGML_Leaderboards_getByDescription(leaderboard_name) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Leaderboard requested", req_id, leaderboard_name);
+		self.browserConsoleLog("Leaderboard requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -706,15 +715,15 @@ function YaGamesGML_Leaderboards_getByDescription(leaderboard_name) {
 		try {
 			self._lb.getLeaderboardDescription(leaderboard_name)
 				.then((result) => {
-					self.browserConsoleLog( "Leaderboards requested.", req_id, result);
+					self.browserConsoleLog("Leaderboards requested.", req_id, result);
 					self.send(req_id, "leaderboardsRequest", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Leaderboard requested failed: ", req_id, err);
+					self.browserConsoleLog("Leaderboard requested failed: ", req_id, err);
 					self.sendError(req_id, "leaderboardsRequestError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -732,11 +741,11 @@ function YaGamesGML_Leaderboards_getPlayerEntry(
 	leaderboard_name,
 	avatarSrcSize,
 	avatarSrcSetSize
-){
+) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Leaderboard PlayerEntry requested", req_id, leaderboard_name);
+		self.browserConsoleLog("Leaderboard PlayerEntry requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -790,11 +799,11 @@ function YaGamesGML_Leaderboards_getEntries(
 	includeUser,
 	quantityAround,
 	quantityTop
-){
+) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Leaderboard Entries requested", req_id, leaderboard_name);
+		self.browserConsoleLog("Leaderboard Entries requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -848,7 +857,7 @@ function YaGamesGML_Leaderboards_setScore(leaderboard_name, score, extra_data) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Leaderboard SetScore requested", req_id, leaderboard_name);
+		self.browserConsoleLog("Leaderboard SetScore requested", req_id, leaderboard_name);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -861,15 +870,15 @@ function YaGamesGML_Leaderboards_setScore(leaderboard_name, score, extra_data) {
 			let _e = extra_data ? extra_data : undefined;
 			self._lb.setLeaderboardScore(leaderboard_name, score, _e)
 				.then((result) => {
-					self.browserConsoleLog( "Leaderboards SetScore success.", req_id, result);
+					self.browserConsoleLog("Leaderboards SetScore success.", req_id, result);
 					self.send(req_id, "leaderboardsSetScore", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Leaderboard SetScore failed", req_id, err);
+					self.browserConsoleLog("Leaderboard SetScore failed", req_id, err);
 					self.sendError(req_id, "leaderboardsSetScoreError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Leaderboard SetScore runtime error", req_id, err);
+			self.browserConsoleLog("Leaderboard SetScore runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -886,13 +895,13 @@ function YaGamesGML_Player_Init(scopes = 0, signature = 0) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player init requested", req_id);
+		self.browserConsoleLog("Player init requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		if (self.getPlayerInitStatus()) {
-			self.browserConsoleLog( "Player was initialized", req_id);
+			self.browserConsoleLog("Player was initialized", req_id);
 			self.send(req_id, "playerInit");
 			return;
 		}
@@ -900,15 +909,15 @@ function YaGamesGML_Player_Init(scopes = 0, signature = 0) {
 			self._ysdk.getPlayer({ scopes: scopes > 0, signed: signature > 0 })
 				.then((player) => {
 					self._player = player;
-					self.browserConsoleLog( "Player was initialized", req_id);
+					self.browserConsoleLog("Player was initialized", req_id);
 					self.send(req_id, "playerInit");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Player init error", req_id, err);
+					self.browserConsoleLog("Player init error", req_id, err);
 					self.sendError(req_id, "playerInitError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -923,7 +932,7 @@ function YaGamesGML_Player_GetUniqueID() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player ID requested", req_id);
+		self.browserConsoleLog("Player ID requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -934,10 +943,10 @@ function YaGamesGML_Player_GetUniqueID() {
 		}
 		try {
 			let cid = self._player.getUniqueID();
-			self.browserConsoleLog( "Player ID requested", req_id, cid);
+			self.browserConsoleLog("Player ID requested", req_id, cid);
 			self.send(req_id, "playerIdRequest", cid);
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -952,7 +961,7 @@ function YaGamesGML_Player_GetIDsPerGame() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player IDs Per Game requested", req_id);
+		self.browserConsoleLog("Player IDs Per Game requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -964,15 +973,15 @@ function YaGamesGML_Player_GetIDsPerGame() {
 		try {
 			self._player.getIDsPerGame()
 				.then((arr) => {
-					self.browserConsoleLog( "Player IDs Per Game requested", req_id, arr);
+					self.browserConsoleLog("Player IDs Per Game requested", req_id, arr);
 					self.send(req_id, "playerIDsPerGame", arr);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Player IDs Per Game requested error", req_id, err);
+					self.browserConsoleLog("Player IDs Per Game requested error", req_id, err);
 					self.sendError(req_id, "playerIDsPerGameError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -988,7 +997,7 @@ function YaGamesGML_Player_GetPhoto(avatarSize) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Photo requested", req_id);
+		self.browserConsoleLog("Player Photo requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -999,10 +1008,10 @@ function YaGamesGML_Player_GetPhoto(avatarSize) {
 		}
 		try {
 			let cname = self._player.getPhoto(avatarSize);
-			self.browserConsoleLog( "Player Photo requested", req_id, cname);
+			self.browserConsoleLog("Player Photo requested", req_id, cname);
 			self.send(req_id, "playerPhotoRequest", cname);
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1017,7 +1026,7 @@ function YaGamesGML_Player_GetName() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Name requested", req_id);
+		self.browserConsoleLog("Player Name requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1028,10 +1037,10 @@ function YaGamesGML_Player_GetName() {
 		}
 		try {
 			let name = self._player.getName();
-			self.browserConsoleLog( "Player Name requested", req_id, name);
+			self.browserConsoleLog("Player Name requested", req_id, name);
 			self.send(req_id, "playerGetNameRequest", name);
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1046,7 +1055,7 @@ function YaGamesGML_Player_GetSignature() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Signature requested", req_id);
+		self.browserConsoleLog("Player Signature requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1059,15 +1068,15 @@ function YaGamesGML_Player_GetSignature() {
 			/// GetPlayer must be called with signature enabled
 			if ("signature" in self._player) {
 				let signature = self._player.signature;
-				self.browserConsoleLog( "Player Signature requested", req_id, signature);
+				self.browserConsoleLog("Player Signature requested", req_id, signature);
 				self.send(req_id, "playerGetSignatureRequest", signature);
 			}
 			else {
-				self.browserConsoleLog( "Player Signature not initialized", req_id);
+				self.browserConsoleLog("Player Signature not initialized", req_id);
 				self.send(req_id, "playerGetSignatureNotInitialized");
 			}
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1084,7 +1093,7 @@ function YaGamesGML_Player_SetData(cdata, flush = 0) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Set Data requested", req_id);
+		self.browserConsoleLog("Player Set Data requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1097,15 +1106,15 @@ function YaGamesGML_Player_SetData(cdata, flush = 0) {
 			let data = self.parseJson(cdata);
 			self._player.setData(data, (flush > 0))
 				.then(() => {
-					self.browserConsoleLog( "Player Set Data requested", req_id);
+					self.browserConsoleLog("Player Set Data requested", req_id);
 					self.send(req_id, "playerSetData");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Player Set Data requested error", req_id, err);
+					self.browserConsoleLog("Player Set Data requested error", req_id, err);
 					self.sendError(req_id, "playerSetDataError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1121,7 +1130,7 @@ function YaGamesGML_Player_GetData(keys = null) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Get Data requested", req_id);
+		self.browserConsoleLog("Player Get Data requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1134,15 +1143,15 @@ function YaGamesGML_Player_GetData(keys = null) {
 			let _k = (keys) ? self.parseJson(keys) : undefined;
 			self._player.getData(_k)
 				.then((result) => {
-					self.browserConsoleLog( "Player Get Data requested", req_id, result);
+					self.browserConsoleLog("Player Get Data requested", req_id, result);
 					self.send(req_id, "playerGetData", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Player Get Data requested error", req_id, err);
+					self.browserConsoleLog("Player Get Data requested error", req_id, err);
 					self.sendError(req_id, "playerGetDataError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1158,7 +1167,7 @@ function YaGamesGML_Player_SetStats(cstats) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Set Stats requested", req_id);
+		self.browserConsoleLog("Player Set Stats requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1171,15 +1180,15 @@ function YaGamesGML_Player_SetStats(cstats) {
 			let stats = self.parseJson(cstats);
 			self._player.setStats(stats)
 				.then(() => {
-					self.browserConsoleLog( "Player Set Stats requested", req_id);
+					self.browserConsoleLog("Player Set Stats requested", req_id);
 					self.send(req_id, "playerSetStats");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Player Set Stats requested error", req_id, err);
+					self.browserConsoleLog("Player Set Stats requested error", req_id, err);
 					self.sendError(req_id, "playerSetStatsError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1195,7 +1204,7 @@ function YaGamesGML_Player_GetStats(keys = null) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Get Stats requested", req_id);
+		self.browserConsoleLog("Player Get Stats requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1208,15 +1217,15 @@ function YaGamesGML_Player_GetStats(keys = null) {
 			let _k = (keys) ? self.parseJson(keys) : undefined;
 			self._player.getStats(_k)
 				.then((result) => {
-					self.browserConsoleLog( "Player Get Stats requested", req_id, result);
+					self.browserConsoleLog("Player Get Stats requested", req_id, result);
 					self.send(req_id, "playerGetStats", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Player Get Stats requested error", req_id, err);
+					self.browserConsoleLog("Player Get Stats requested error", req_id, err);
 					self.sendError(req_id, "playerGetStatsError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1232,7 +1241,7 @@ function YaGamesGML_Player_IncrementStats(increments) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player Increment Stats requested", req_id);
+		self.browserConsoleLog("Player Increment Stats requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1245,15 +1254,15 @@ function YaGamesGML_Player_IncrementStats(increments) {
 			let _i = self.parseJson(increments);
 			self._player.incrementStats(_i)
 				.then((result) => {
-					self.browserConsoleLog( "Player Increment Stats requested", req_id, result);
+					self.browserConsoleLog("Player Increment Stats requested", req_id, result);
 					self.send(req_id, "playerIncrementStats", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Player Increment Stats requested error", req_id, err);
+					self.browserConsoleLog("Player Increment Stats requested error", req_id, err);
 					self.sendError(req_id, "playerIncrementStatsError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1268,7 +1277,7 @@ function YaGamesGML_Player_GetMode() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player GetMode requested", req_id);
+		self.browserConsoleLog("Player GetMode requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1279,10 +1288,10 @@ function YaGamesGML_Player_GetMode() {
 		}
 		try {
 			let cid = self._player.getMode();
-			self.browserConsoleLog( "Player GetMode requested", req_id, cid);
+			self.browserConsoleLog("Player GetMode requested", req_id, cid);
 			self.send(req_id, "playerGetModeRequest", cid);
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1297,7 +1306,7 @@ function YaGamesGML_OpenAuthDialog() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Player authorization request", req_id);
+		self.browserConsoleLog("Player authorization request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1310,20 +1319,20 @@ function YaGamesGML_OpenAuthDialog() {
 			if (self._player.getMode() === 'lite') {
 				self._ysdk.auth.openAuthDialog()
 					.then(() => {
-						self.browserConsoleLog( "The player has successfully logged in", req_id);
+						self.browserConsoleLog("The player has successfully logged in", req_id);
 						self.send(req_id, "playerLogged");
 					})
 					.catch((err) => {
-						self.browserConsoleLog( "The player is not logged in", req_id, err);
+						self.browserConsoleLog("The player is not logged in", req_id, err);
 						self.sendError(req_id, "playerLoggedError", err);
 					});
 			}
 			else {
-				self.browserConsoleLog( "The player is already logged in", req_id);
+				self.browserConsoleLog("The player is already logged in", req_id);
 				self.send(req_id, "playerAlreadyLogged");
 			}
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1338,17 +1347,17 @@ function YaGamesGMS_Screen_Fullscreen_Status() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "FullScreen status requested", req_id);
+		self.browserConsoleLog("FullScreen status requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
 			let status = self._ysdk.screen.fullscreen.status;
-			self.browserConsoleLog( "FullScreen status received", req_id, status);
+			self.browserConsoleLog("FullScreen status received", req_id, status);
 			self.send(req_id, "fullscreenStatus", status);
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -1363,7 +1372,7 @@ function YaGamesGMS_Screen_Fullscreen_Request() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "FullScreen mode requested", req_id);
+		self.browserConsoleLog("FullScreen mode requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1371,15 +1380,15 @@ function YaGamesGMS_Screen_Fullscreen_Request() {
 		try {
 			self._ysdk.screen.fullscreen.request()
 				.then(() => {
-					self.browserConsoleLog( "Full screen transition successful", req_id);
+					self.browserConsoleLog("Full screen transition successful", req_id);
 					self.send(req_id, "fullscreenOpened");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Switch to fullscreen mode failed", req_id, err);
+					self.browserConsoleLog("Switch to fullscreen mode failed", req_id, err);
 					self.sendError(req_id, "fullscreenOpenError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -1394,7 +1403,7 @@ function YaGamesGMS_Screen_Fullscreen_Exit() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "FullScreen Exit requested", req_id);
+		self.browserConsoleLog("FullScreen Exit requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1402,15 +1411,15 @@ function YaGamesGMS_Screen_Fullscreen_Exit() {
 		try {
 			self._ysdk.screen.fullscreen.exit()
 				.then(() => {
-					self.browserConsoleLog( "Successful exit from fullscreen mode", req_id);
+					self.browserConsoleLog("Successful exit from fullscreen mode", req_id);
 					self.send(req_id, "fullscreenExited");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Fullscreen exit error", req_id, err);
+					self.browserConsoleLog("Fullscreen exit error", req_id, err);
 					self.sendError(req_id, "fullscreenExitError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -1425,7 +1434,7 @@ function YaGamesGMS_Feedback_CanReview() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Сan Review requested", req_id);
+		self.browserConsoleLog("Сan Review requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1433,15 +1442,15 @@ function YaGamesGMS_Feedback_CanReview() {
 		try {
 			self._ysdk.feedback.canReview()
 				.then((result) => {
-					self.browserConsoleLog( "Request Can Review success", req_id, result);
+					self.browserConsoleLog("Request Can Review success", req_id, result);
 					self.send(req_id, "canReview", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Request Can Review error", req_id, err);
+					self.browserConsoleLog("Request Can Review error", req_id, err);
 					self.sendError(req_id, "canReviewError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1456,7 +1465,7 @@ function YaGamesGMS_Feedback_RequestReview() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Request Review requested", req_id);
+		self.browserConsoleLog("Request Review requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1464,15 +1473,15 @@ function YaGamesGMS_Feedback_RequestReview() {
 		try {
 			self._ysdk.feedback.requestReview()
 				.then((result) => {
-					self.browserConsoleLog( "Successful request Review", req_id, result);
+					self.browserConsoleLog("Successful request Review", req_id, result);
 					self.send(req_id, "requestReview", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Request Review error", req_id, err);
+					self.browserConsoleLog("Request Review error", req_id, err);
 					self.sendError(req_id, "requestReviewError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -1487,7 +1496,7 @@ function YaGamesGMS_Shortcut_CanShowPrompt() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Can Shortcut requested", req_id);
+		self.browserConsoleLog("Can Shortcut requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1495,15 +1504,15 @@ function YaGamesGMS_Shortcut_CanShowPrompt() {
 		try {
 			self._ysdk.shortcut.canShowPrompt()
 				.then((result) => {
-					self.browserConsoleLog( "Request Can Shortcut success", req_id, result);
+					self.browserConsoleLog("Request Can Shortcut success", req_id, result);
 					self.send(req_id, "canShortcut", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Request Can Shortcut error", req_id, err);
+					self.browserConsoleLog("Request Can Shortcut error", req_id, err);
 					self.sendError(req_id, "canShortcutError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -1518,7 +1527,7 @@ function YaGamesGMS_Shortcut_ShowPrompt() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Shortcut create requested", req_id);
+		self.browserConsoleLog("Shortcut create requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1526,15 +1535,15 @@ function YaGamesGMS_Shortcut_ShowPrompt() {
 		try {
 			self._ysdk.shortcut.showPrompt()
 				.then((result) => {
-					self.browserConsoleLog( "Successful created Shortcut", req_id, result);
+					self.browserConsoleLog("Successful created Shortcut", req_id, result);
 					self.send(req_id, "shortcutCreated", result);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Shortcut create error", req_id, err);
+					self.browserConsoleLog("Shortcut create error", req_id, err);
 					self.sendError(req_id, "shortcutCreateError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -1546,17 +1555,17 @@ function YaGamesGMS_Shortcut_ShowPrompt() {
  * @param signed {?number} Add a signature to confirm the purchase.
  * @returns {Number} Request ID
  */
- function YaGamesGML_Payments_Init(signed = 1) {
+function YaGamesGML_Payments_Init(signed = 1) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Payments init requested", req_id);
+		self.browserConsoleLog("Payments init requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		if (self.getPaymentsInitStatus()) {
-			self.browserConsoleLog( "Payments was initialized", req_id);
+			self.browserConsoleLog("Payments was initialized", req_id);
 			self.send(req_id, "paymentsInit");
 			return;
 		}
@@ -1568,15 +1577,15 @@ function YaGamesGMS_Shortcut_ShowPrompt() {
 			self._ysdk.getPayments(options)
 				.then((payments) => {
 					self._payments = payments;
-					self.browserConsoleLog( "Payments was initialized", req_id);
+					self.browserConsoleLog("Payments was initialized", req_id);
 					self.send(req_id, "paymentsInit");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Payments init error", req_id, err);
+					self.browserConsoleLog("Payments init error", req_id, err);
 					self.sendError(req_id, "paymentsInitError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
@@ -1589,11 +1598,11 @@ function YaGamesGMS_Shortcut_ShowPrompt() {
  * @param developerPayload {?string} Additional information about the purchase that you want to transfer to your server.
  * @returns {Number} Request ID
  */
-function YaGamesGMS_Payments_Purchase(cid, developerPayload= null) {
+function YaGamesGMS_Payments_Purchase(cid, developerPayload = null) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Purchase request", req_id);
+		self.browserConsoleLog("Purchase request", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1605,23 +1614,23 @@ function YaGamesGMS_Payments_Purchase(cid, developerPayload= null) {
 		try {
 			let options = { id: cid };
 			if (developerPayload) {
-				options = { 
+				options = {
 					id: cid,
 					developerPayload: developerPayload
 				};
 			}
 			self._payments.purchase(options)
 				.then((p) => {
-					self.browserConsoleLog( "Purchase requested", req_id, p);
+					self.browserConsoleLog("Purchase requested", req_id, p);
 					self.send(req_id, "purchaseRequested", p);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Purchase request error", req_id, err);
+					self.browserConsoleLog("Purchase request error", req_id, err);
 					self.sendError(req_id, "purchaseRequestError", err);
 				});
 
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1636,7 +1645,7 @@ function YaGamesGMS_Payments_GetPurchases() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Get all purchases", req_id);
+		self.browserConsoleLog("Get all purchases", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1648,16 +1657,16 @@ function YaGamesGMS_Payments_GetPurchases() {
 		try {
 			self._payments.getPurchases()
 				.then((purchases) => {
-					self.browserConsoleLog( "Get Purchases requested", req_id, purchases);
+					self.browserConsoleLog("Get Purchases requested", req_id, purchases);
 					self.send(req_id, "getPurchases", purchases);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Get Purchases error", req_id, err);
+					self.browserConsoleLog("Get Purchases error", req_id, err);
 					self.sendError(req_id, "getPurchasesError", err);
 				});
 
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1672,7 +1681,7 @@ function YaGamesGMS_Payments_GetCatalog() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Get the product catalog", req_id);
+		self.browserConsoleLog("Get the product catalog", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1684,16 +1693,16 @@ function YaGamesGMS_Payments_GetCatalog() {
 		try {
 			self._payments.getCatalog()
 				.then((products) => {
-					self.browserConsoleLog( "Get Catalog", req_id, products);
+					self.browserConsoleLog("Get Catalog", req_id, products);
 					self.send(req_id, "getCatalog", products);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Get Catalog error", req_id, err);
+					self.browserConsoleLog("Get Catalog error", req_id, err);
 					self.sendError(req_id, "getCatalogError", err);
 				});
 
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1709,7 +1718,7 @@ function YaGamesGMS_Payments_ConsumePurchase(purchase_token) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Consume Purchase", req_id);
+		self.browserConsoleLog("Consume Purchase", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1721,16 +1730,16 @@ function YaGamesGMS_Payments_ConsumePurchase(purchase_token) {
 		try {
 			self._payments.consumePurchase(purchase_token)
 				.then(() => {
-					self.browserConsoleLog( "Consume purchase requested", req_id);
+					self.browserConsoleLog("Consume purchase requested", req_id);
 					self.send(req_id, "consumePurchase");
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Consume purchase error", req_id, err);
+					self.browserConsoleLog("Consume purchase error", req_id, err);
 					self.sendError(req_id, "consumePurchaseError", err);
 				});
 
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1747,7 +1756,7 @@ function YaGamesGMS_GetFlags(defaultFlags = "", clientFeatures = "") {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Get Flags", req_id);
+		self.browserConsoleLog("Get Flags", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1770,15 +1779,15 @@ function YaGamesGMS_GetFlags(defaultFlags = "", clientFeatures = "") {
 			}
 			self._ysdk.getFlags(_options)
 				.then((flags) => {
-					self.browserConsoleLog( "Get Flags requested", req_id, flags);
+					self.browserConsoleLog("Get Flags requested", req_id, flags);
 					self.send(req_id, "getFlags", flags);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Get Flags error", req_id, err);
+					self.browserConsoleLog("Get Flags error", req_id, err);
 					self.sendError(req_id, "getFlagsError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1795,7 +1804,7 @@ function YaGamesGMS_Event_Dispatch(event_name, detail = null) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "Event Dispatch", req_id);
+		self.browserConsoleLog("Event Dispatch", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1804,15 +1813,15 @@ function YaGamesGMS_Event_Dispatch(event_name, detail = null) {
 			let _o = (detail == null) ? undefined : JSON.parse(detail);
 			self._ysdk.dispatchEvent(self._ysdk.EVENTS[event_name], _o)
 				.then(() => {
-					self.browserConsoleLog( "eventDispatch", req_id, event_name);
+					self.browserConsoleLog("eventDispatch", req_id, event_name);
 					self.send(req_id, "eventDispatch", event_name);
 				})
 				.catch((err) => {
-					self.browserConsoleLog( "Event Dispatch error", req_id, err);
+					self.browserConsoleLog("Event Dispatch error", req_id, err);
 					self.sendError(req_id, "eventDispatchError", err);
 				});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
@@ -1828,18 +1837,18 @@ function YaGamesGMS_Event_On(event_name) {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog( "On Event", req_id);
+		self.browserConsoleLog("On Event", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
 		try {
 			self._ysdk.onEvent(self._ysdk.EVENTS[event_name], () => {
-				self.browserConsoleLog( "onEvent", req_id, event_name);
+				self.browserConsoleLog("onEvent", req_id, event_name);
 				self.send(req_id, "onEvent", event_name);
 			});
 		} catch (err) {
-			self.browserConsoleLog( "Runtime error", req_id, err);
+			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
