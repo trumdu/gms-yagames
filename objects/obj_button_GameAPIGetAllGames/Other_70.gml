@@ -9,20 +9,22 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-			case YaGames_CallFullscreenStatus:
-				// Fullscreen Status
-                var _value = async_load[? "value"];
-				switch (_value) {
-					case YaGames_FullScreen_ON:
-						full_status = "STATUS_ON";
-						break;
-					case YaGames_FullScreen_OFF:
-						full_status = "STATUS_OFF";
-						break;
-					default:
-						full_status = "ERROR " + string(_value);
-				}
-				log(full_status);
+			case YaGames_CallGetAllGames:
+				var _data = json_parse(async_load[? "data"]);
+				var _developer_url = _data.developerURL;
+				// _data.games[0].appID
+				// _data.games[0].title
+				// _data.games[0].url
+				// _data.games[0].coverURL
+				// _data.games[0].iconURL
+				log("Developer URL: " + _developer_url);
+			break
+			
+			case YaGames_CallGetAllGamesError:
+                var errCode = async_load[? "code"];
+                var errName = async_load[? "name"];
+                var errMessage = async_load[? "message"];		
+				// Error when requesting a list of account games
 			break;
 			
             case YaGames_CallNotInitSDK:

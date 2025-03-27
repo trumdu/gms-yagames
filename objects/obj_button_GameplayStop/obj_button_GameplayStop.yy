@@ -10,8 +10,8 @@
   "name":"obj_button_GameplayStop",
   "overriddenProperties":[],
   "parent":{
-    "name":"Gameplay",
-    "path":"folders/Objects/Buttons/Gameplay.yy",
+    "name":"Gameplay & GamesAPI",
+    "path":"folders/Objects/Buttons/Gameplay & GamesAPI.yy",
   },
   "parentObjectId":{
     "name":"obj_button_parent",

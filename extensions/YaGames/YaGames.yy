@@ -11,10 +11,10 @@
   "androidsourcedir":"",
   "author":"",
   "classname":"",
-  "copyToTargets":32,
+  "copyToTargets":17179869216,
   "description":"",
   "exportToGame":true,
-  "extensionVersion":"1.0.13",
+  "extensionVersion":"1.0.14",
   "files":[
     {"$GMExtensionFile":"","%Name":"","constants":[
         {"$GMExtensionConstant":"","%Name":"YaGames_DeviceMobile","hidden":false,"name":"YaGames_DeviceMobile","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"mobile\"",},
@@ -121,7 +121,12 @@
         {"$GMExtensionConstant":"","%Name":"YaGames_CallGameApiResume","hidden":false,"name":"YaGames_CallGameApiResume","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"gameApiResume\"",},
         {"$GMExtensionConstant":"","%Name":"YaGames_CallGameApiPause","hidden":false,"name":"YaGames_CallGameApiPause","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"gameApiPause\"",},
         {"$GMExtensionConstant":"","%Name":"YaGames_RequestIdGameApi","hidden":false,"name":"YaGames_RequestIdGameApi","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"42",},
-      ],"copyToTargets":144115188075855904,"filename":"YaGames.js","final":"","functions":[
+        {"$GMExtensionConstant":"","%Name":"YaGames_CallGetGameById","hidden":false,"name":"YaGames_CallGetGameById","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"getGameByID\"",},
+        {"$GMExtensionConstant":"","%Name":"YaGames_CallGetGameByIdUndefined","hidden":false,"name":"YaGames_CallGetGameByIdUndefined","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"getGameByIdUndefined\"",},
+        {"$GMExtensionConstant":"","%Name":"YaGames_CallGetGameByIdError","hidden":false,"name":"YaGames_CallGetGameByIdError","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"getGameByIdError\"",},
+        {"$GMExtensionConstant":"","%Name":"YaGames_CallGetAllGames","hidden":false,"name":"YaGames_CallGetAllGames","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"getAllGames\"",},
+        {"$GMExtensionConstant":"","%Name":"YaGames_CallGetAllGamesError","hidden":false,"name":"YaGames_CallGetAllGamesError","resourceType":"GMExtensionConstant","resourceVersion":"2.0","value":"\"getAllGamesError\"",},
+      ],"copyToTargets":17179869216,"filename":"YaGames.js","final":"","functions":[
         {"$GMExtensionFunction":"","%Name":"YaGames_getInitStatus","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_getInitStatus","help":"YaGames_getInitStatus()","hidden":false,"kind":5,"name":"YaGames_getInitStatus","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
         {"$GMExtensionFunction":"","%Name":"YaGames_setDebugMode","argCount":0,"args":[2,],"documentation":"","externalName":"YaGamesGMS_setDebugMode","help":"YaGames_setDebugMode( enable (1) / disable (0) )","hidden":false,"kind":5,"name":"YaGames_setDebugMode","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
         {"$GMExtensionFunction":"","%Name":"YaGames_showFullscreenAdv","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_showFullscreenAdv","help":"YaGames_showFullscreenAdv()","hidden":false,"kind":5,"name":"YaGames_showFullscreenAdv","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
@@ -179,6 +184,8 @@
         {"$GMExtensionFunction":"","%Name":"YaGames_getServerTime","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_GetServerTime","help":"YaGames_getServerTime()","hidden":false,"kind":5,"name":"YaGames_getServerTime","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
         {"$GMExtensionFunction":"","%Name":"YaGames_Player_GetSignature","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Player_GetSignature","help":"YaGames_Player_GetSignature()","hidden":false,"kind":5,"name":"YaGames_Player_GetSignature","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
         {"$GMExtensionFunction":"","%Name":"YaGames_Player_GetName","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGML_Player_GetName","help":"YaGamesGML_Player_GetName()","hidden":false,"kind":5,"name":"YaGames_Player_GetName","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
+        {"$GMExtensionFunction":"","%Name":"YaGames_GetGameByID","argCount":0,"args":[2,],"documentation":"","externalName":"YaGamesGMS_GetGameByID","help":"YaGames_GetGameByID(double game_id)","hidden":false,"kind":5,"name":"YaGames_GetGameByID","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
+        {"$GMExtensionFunction":"","%Name":"YaGames_GetAllGames","argCount":0,"args":[],"documentation":"","externalName":"YaGamesGMS_GetAllGames","help":"YaGames_GetAllGames()","hidden":false,"kind":5,"name":"YaGames_GetAllGames","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
       ],"init":"","kind":5,"name":"","order":[
         {"name":"YaGames_getInitStatus","path":"extensions/YaGames/YaGames.yy",},
         {"name":"YaGames_setDebugMode","path":"extensions/YaGames/YaGames.yy",},
@@ -242,7 +249,7 @@
   "gradleinject":"",
   "hasConvertedCodeInjection":true,
   "helpfile":"",
-  "HTML5CodeInjection":"<GM_HTML5_PostStyle>\r\n<style>\r\n\t\t\tbody\r\n\t\t\t{\r\n\t\t\t\toverflow:hidden;\r\n\t\t\t}\r\n\t\t</style>\r\n</GM_HTML5_PostStyle>\r\n\r\n<GM_HTML5_PreBody>\r\n\t<script>\r\n\t\tvar YaGames_send_game_start = \"${YYEXTOPT_YaGames_send_game_start}\".toLowerCase() == \"true\";\r\n\t\tvar YaGames_sdk_src = \"${YYEXTOPT_YaGames_sdk_src}\";\r\n\t\t// Remove the input lag (when the click does not always count)\r\n\t\tdocument.addEventListener('touchstart', e => { e.preventDefault(); }, { passive: false })\r\n\t</script>\r\n</GM_HTML5_PreBody>",
+  "HTML5CodeInjection":"<GM_HTML5_PostStyle>\r\n<style>\r\n\t\t\tbody\r\n\t\t\t{\r\n\t\t\t\toverflow:hidden;\r\n\t\t\t}\r\n\t\t</style>\r\n</GM_HTML5_PostStyle>\r\n\r\n<GM_HTML5_PreBody>\r\n\t<script>\r\n\t\tvar YaGames_send_game_start = \"${YYEXTOPT_YaGames_send_game_start}\".toLowerCase() == \"true\";\r\n\t\tvar YaGames_sdk_src = \"${YYEXTOPT_YaGames_sdk_src}\";\r\n\t\t// Remove the input lag (when the click does not always count)\r\n\t\tdocument.addEventListener('touchstart', e => { e.preventDefault(); }, { passive: false })\r\n\t</script>\r\n</GM_HTML5_PreBody>\r\n",
   "html5Props":true,
   "IncludedResources":[],
   "installdir":"",

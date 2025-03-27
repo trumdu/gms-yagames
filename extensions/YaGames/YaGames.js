@@ -170,6 +170,22 @@ var YaGamesGMS = {
 		self.send(request_id, "notPaymentsInitSDK", "Payments not Initialized");
 	},
 	/**
+	 * Notification of a game pause event
+	 */
+	sendGameApiPause: function () {
+		let self = YaGamesGMS;
+		self.send(self._game_api_request_id, "gameApiPause");
+		self.browserConsoleLog("GAME PAUSE", self._game_api_request_id);
+	},
+	/**
+	 * Notification of a game resume event
+	 */
+	sendGameApiResume: function () {
+		let self = YaGamesGMS;
+		self.send(self._game_api_request_id, "gameApiResume");
+		self.browserConsoleLog("GAME RESUME", self._game_api_request_id);
+	},
+	/**
 	 * @returns {boolean}
 	 */
 	getInitStatus: function () {
@@ -217,12 +233,30 @@ function YaGamesGMS_SdkInit() {
 		}
 		// Subscribing to pause events
 		self._ysdk.on('game_api_resume', () => {
-			self.send(self._game_api_request_id, "gameApiResume");
-			self.browserConsoleLog("Yandex SDK GameResume", self._game_api_request_id);
+			YaGamesGMS.sendGameApiResume();
 		});
 		self._ysdk.on('game_api_pause', () => {
-			self.send(self._game_api_request_id, "gameApiPause");
-			self.browserConsoleLog("Yandex SDK GamePause", self._game_api_request_id);
+			YaGamesGMS.sendGameApiPause();
+		});
+		// Sending pause events when the game is focused
+		document.addEventListener("visibilitychange", function () {
+			if (document.hidden) {
+				YaGamesGMS.sendGameApiPause();
+			} else {
+				YaGamesGMS.sendGameApiResume();
+			}
+		});
+		window.addEventListener("blur", function () {
+			YaGamesGMS.sendGameApiPause();
+		});
+		window.addEventListener("focus", function () {
+			YaGamesGMS.sendGameApiResume();
+		});
+		window.addEventListener("pagehide", function () {
+			YaGamesGMS.sendGameApiPause();
+		});
+		window.addEventListener("pageshow", function () {
+			YaGamesGMS.sendGameApiResume();
 		});
 	});
 }
@@ -646,7 +680,39 @@ function YaGamesGML_getEnvironment() {
 			return;
 		}
 		try {
-			let envDt = self._ysdk.environment;
+			let envDt = {};
+			try {
+				let _env = self._ysdk.environment;
+				envDt.app = { id: _env.app.id };
+				envDt.i18n = {
+					lang: _env.i18n.lang,
+					tld: _env.i18n.tld
+				};
+				if ('payload' in _env) {
+					envDt.payload = _env.payload;
+				}
+				try {
+					if ('browser' in _env && 'lang' in _env.browser) {
+						envDt.browser = { lang: _env.browser.lang };
+					}
+					if ('data' in _env && 'baseUrl' in _env.data) {
+						envDt.data = { baseUrl: _env.data.baseUrl };
+					}
+					if ('isTelegram' in _env) {
+						envDt.isTelegram = _env.isTelegram;
+					}
+					if ('domain' in _env) {
+						envDt.domain = _env.domain;
+					}
+				}
+				catch (err) {
+					console.error(err);
+				}
+			}
+			catch (err) {
+				envDt = self._ysdk.environment;
+				console.error(err);
+			}
 			self.browserConsoleLog("Environment", req_id, envDt);
 			self.send(req_id, "environment", envDt);
 		} catch (err) {
@@ -1850,6 +1916,78 @@ function YaGamesGMS_Event_On(event_name) {
 		} catch (err) {
 			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get information about another game on your account by ID
+ * @param game_id {number} Event name
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_GetGameByID(game_id) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Get GameByID request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let _id = Number(game_id);
+			self._ysdk.features.GamesAPI.getGameByID(_id).then(({ isAvailable, game }) => {
+				if (isAvailable) {
+					self.browserConsoleLog("Get GameByID", req_id, game);
+					self.send(req_id, "getGameByID", game);
+				} else {
+					self.browserConsoleLog("Get GameByID undefined", req_id, err);
+					self.sendError(req_id, "getGameByIdUndefined", err);
+				}
+			}).catch(err => {
+				self.browserConsoleLog("Get GameByID error", req_id, err);
+				self.sendError(req_id, "getGameByIdError", err);
+			});
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err)
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get information about other games on your account
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_GetAllGames() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Get AllGames request", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self._ysdk.features.GamesAPI.getAllGames().then(({ games, developerURL }) => {
+				let _g = {
+					games: [],
+					developerURL: developerURL
+				};
+				games.forEach((game) => {
+					_g.games.push(game);
+				})
+				self.browserConsoleLog("Get AllGames", req_id, _g);
+				self.send(req_id, "getAllGames", _g);
+			}).catch(err => {
+				self.browserConsoleLog("Get AllGames error", req_id, err);
+				self.sendError(req_id, "getAllGamesError", err);
+			})
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err)
 		}
 	}, 0);
 	return req_id;

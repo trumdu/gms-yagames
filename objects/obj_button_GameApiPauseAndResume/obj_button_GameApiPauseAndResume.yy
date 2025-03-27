@@ -9,8 +9,8 @@
   "name":"obj_button_GameApiPauseAndResume",
   "overriddenProperties":[],
   "parent":{
-    "name":"Gameplay",
-    "path":"folders/Objects/Buttons/Gameplay.yy",
+    "name":"Gameplay & GamesAPI",
+    "path":"folders/Objects/Buttons/Gameplay & GamesAPI.yy",
   },
   "parentObjectId":{
     "name":"obj_button_parent",
@@ -34,8 +34,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_button_long",
-    "path":"sprites/spr_button_long/spr_button_long.yy",
+    "name":"spr_button_short",
+    "path":"sprites/spr_button_short/spr_button_short.yy",
   },
   "spriteMaskId":null,
   "visible":true,
