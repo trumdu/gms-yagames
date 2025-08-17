@@ -148,14 +148,6 @@ var YaGamesGMS = {
 	/**
 	 * @param request_id {number} Request ID
 	 */
-	sendLeaderboardNotInitStatus: function (request_id) {
-		let self = YaGamesGMS;
-		self.browserConsoleLog("notLeaderboardInitSDK", request_id, "Leaderboard not Initialized");
-		self.send(request_id, "notLeaderboardInitSDK", "Leaderboard not Initialized");
-	},
-	/**
-	 * @param request_id {number} Request ID
-	 */
 	sendPlayerNotInitStatus: function (request_id) {
 		let self = YaGamesGMS;
 		self.browserConsoleLog("notPlayerInitSDK", request_id, "Player not Initialized");
@@ -190,12 +182,6 @@ var YaGamesGMS = {
 	 */
 	getInitStatus: function () {
 		return YaGamesGMS._ysdk !== null;
-	},
-	/**
-	 * @returns {boolean}
-	 */
-	getLeaderboardInitStatus: function () {
-		return YaGamesGMS._lb !== null;
 	},
 	/**
 	 * @returns {boolean}
@@ -237,6 +223,18 @@ function YaGamesGMS_SdkInit() {
 		});
 		self._ysdk.on('game_api_pause', () => {
 			YaGamesGMS.sendGameApiPause();
+		});
+		self._ysdk.on('multiplayer-sessions-transaction', ({ opponentId, transactions }) => {
+			let _opponent = {
+				opponentId: opponentId,
+				transactions: transactions
+			};
+			self.browserConsoleLog("Multiplayer Sessions Transaction", self._game_api_request_id, _opponent);
+			self.send(self._game_api_request_id, "multiplayerSessionsTransaction", _opponent);
+		});
+		self._ysdk.on('multiplayer-sessions-finish', (opponentId) => {
+			self.browserConsoleLog("Multiplayer Sessions Finish", self._game_api_request_id, opponentId);
+			self.send(self._game_api_request_id, "multiplayerSessionsFinish", opponentId);
 		});
 		// Sending pause events when the game is focused
 		document.addEventListener("visibilitychange", function () {
@@ -724,6 +722,7 @@ function YaGamesGML_getEnvironment() {
 }
 
 /**
+ * Deprecated
  * Leaderboard object Initialization
  * @returns {Number} Request ID
  */
@@ -731,31 +730,8 @@ function YaGamesGML_Leaderboards_Init() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog("Leaderboard init requested", req_id);
-		if (!self.getInitStatus()) {
-			self.sendSdkNotInitStatus(req_id);
-			return;
-		}
-		if (self.getLeaderboardInitStatus()) {
-			self.browserConsoleLog("Leaderboard was initialized", req_id);
-			self.send(req_id, "leaderboardsInit");
-			return;
-		}
-		try {
-			self._ysdk.getLeaderboards()
-				.then((lb) => {
-					self._lb = lb;
-					self.browserConsoleLog("Leaderboard was initialized", req_id);
-					self.send(req_id, "leaderboardsInit");
-				})
-				.catch((err) => {
-					self.browserConsoleLog("Leaderboards init error", req_id, err);
-					self.sendError(req_id, "leaderboardsInitError", err);
-				});
-		} catch (err) {
-			self.browserConsoleLog("Runtime error", req_id, err);
-			self.sendError(req_id, "RuntimeError", err)
-		}
+		self.browserConsoleLog("Deprecated. Leaderboard was initialized", req_id);
+		self.send(req_id, "leaderboardsInit");
 	}, 0);
 	return req_id;
 }
@@ -774,12 +750,8 @@ function YaGamesGML_Leaderboards_getByDescription(leaderboard_name) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getLeaderboardInitStatus()) {
-			self.sendLeaderboardNotInitStatus(req_id);
-			return;
-		}
 		try {
-			self._lb.getLeaderboardDescription(leaderboard_name)
+			self._ysdk.leaderboards.getDescription(leaderboard_name)
 				.then((result) => {
 					self.browserConsoleLog("Leaderboards requested.", req_id, result);
 					self.send(req_id, "leaderboardsRequest", result);
@@ -816,12 +788,8 @@ function YaGamesGML_Leaderboards_getPlayerEntry(
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getLeaderboardInitStatus()) {
-			self.sendLeaderboardNotInitStatus(req_id);
-			return;
-		}
 		try {
-			self._lb.getLeaderboardPlayerEntry(leaderboard_name)
+			self._ysdk.leaderboards.getPlayerEntry(leaderboard_name)
 				.then((result) => {
 					if (avatarSrcSize && result.player) {
 						result.player.getAvatarSrc = result.player.getAvatarSrc(avatarSrcSize);
@@ -874,17 +842,13 @@ function YaGamesGML_Leaderboards_getEntries(
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getLeaderboardInitStatus()) {
-			self.sendLeaderboardNotInitStatus(req_id);
-			return;
-		}
 		try {
 			let options = {};
 			if (includeUser) options.includeUser = includeUser > 0;
 			if (quantityAround) options.quantityAround = (quantityAround < 1) ? 1 : ((quantityAround > 10) ? 10 : quantityAround);
 			if (quantityTop) options.quantityTop = (quantityTop < 1) ? 1 : ((quantityTop > 20) ? 20 : quantityTop);
 
-			self._lb.getLeaderboardEntries(leaderboard_name, options)
+			self._ysdk.leaderboards.getEntries(leaderboard_name, options)
 				.then((result) => {
 					if (result.entries) {
 						for (let i = 0; i < result.entries.length; i++) {
@@ -928,13 +892,9 @@ function YaGamesGML_Leaderboards_setScore(leaderboard_name, score, extra_data) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getLeaderboardInitStatus()) {
-			self.sendLeaderboardNotInitStatus(req_id);
-			return;
-		}
 		try {
 			let _e = extra_data ? extra_data : undefined;
-			self._lb.setLeaderboardScore(leaderboard_name, score, _e)
+			self._ysdk.leaderboards.setScore(leaderboard_name, score, _e)
 				.then((result) => {
 					self.browserConsoleLog("Leaderboards SetScore success.", req_id, result);
 					self.send(req_id, "leaderboardsSetScore", result);
@@ -1105,6 +1065,35 @@ function YaGamesGML_Player_GetName() {
 			let name = self._player.getName();
 			self.browserConsoleLog("Player Name requested", req_id, name);
 			self.send(req_id, "playerGetNameRequest", name);
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Get user paying status
+ * @returns {Number} Request ID
+ */
+function YaGamesGML_Player_GetPayingStatus() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Player Name requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		if (!self.getPlayerInitStatus()) {
+			self.sendPlayerNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let payingStatus = self._player.getPayingStatus();
+			self.browserConsoleLog("Player Paying Status requested", req_id, payingStatus);
+			self.send(req_id, "playerGetPayingStatusRequest", payingStatus);
 		} catch (err) {
 			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
@@ -1336,6 +1325,7 @@ function YaGamesGML_Player_IncrementStats(increments) {
 }
 
 /**
+ * Deprecated
  * Player Get Mode
  * @returns {Number} Request ID
  */
@@ -1343,7 +1333,7 @@ function YaGamesGML_Player_GetMode() {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
-		self.browserConsoleLog("Player GetMode requested", req_id);
+		self.browserConsoleLog("Deprecated. Player GetMode requested", req_id);
 		if (!self.getInitStatus()) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
@@ -1353,9 +1343,38 @@ function YaGamesGML_Player_GetMode() {
 			return;
 		}
 		try {
-			let cid = self._player.getMode();
-			self.browserConsoleLog("Player GetMode requested", req_id, cid);
+			let cid = self._player.isAuthorized() ? "" : "lite";
+			self.browserConsoleLog("Deprecated. Player GetMode requested", req_id, cid);
 			self.send(req_id, "playerGetModeRequest", cid);
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Player Is Authorized
+ * @returns {Number} Request ID
+ */
+function YaGamesGML_Player_IsAuthorized() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Player Is Authorized requested", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		if (!self.getPlayerInitStatus()) {
+			self.sendPlayerNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let _st = self._player.isAuthorized();
+			self.browserConsoleLog("Player Is Authorized", req_id, _st);
+			self.send(req_id, "playerIsAuthorizedRequest", _st);
 		} catch (err) {
 			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err);
@@ -1382,7 +1401,7 @@ function YaGamesGML_OpenAuthDialog() {
 			return;
 		}
 		try {
-			if (self._player.getMode() === 'lite') {
+			if (self._player.isAuthorized() === false) {
 				self._ysdk.auth.openAuthDialog()
 					.then(() => {
 						self.browserConsoleLog("The player has successfully logged in", req_id);
@@ -1988,6 +2007,99 @@ function YaGamesGMS_GetAllGames() {
 		} catch (err) {
 			self.browserConsoleLog("Runtime error", req_id, err);
 			self.sendError(req_id, "RuntimeError", err)
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Initialization and Session Loading
+ * @param _count {number} umber of opponent sessions to load
+ * @param _isEventBased {number} Flag to initialize work through events
+ * @param _maxOpponentTurnTime {number} Opponent's turn time limit (ms)
+ * @param meta_json {string} Selection Parameters. A key-value array in JSON format
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_MultiplayerSessionsInit(_count, _isEventBased, _maxOpponentTurnTime, meta_json) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Multiplayer Sessions Init", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let _meta = self.parseJson(meta_json);
+			self._ysdk.multiplayer.sessions.init({
+				count: Math.trunc(_count),
+				isEventBased: _isEventBased > 0,
+				maxOpponentTurnTime: Math.trunc(_maxOpponentTurnTime),
+				meta: _meta
+			}).then((opponents) => {
+				self.browserConsoleLog("Multiplayer Sessions Init requested", req_id, opponents);
+				self.send(req_id, "multiplayerSessionsInited", opponents);
+			}).catch((err) => {
+				self.browserConsoleLog("Multiplayer Sessions Init error", req_id, err);
+				self.sendError(req_id, "multiplayerSessionsInitError", err);
+			});
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Recording Game Session
+ * @param transaction_json {string} A key-value array in JSON format
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_MultiplayerRecordingGameSession(transaction_json) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Multiplayer Recording Game Session", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let _transaction = self.parseJson(transaction_json);
+			self._ysdk.multiplayer.sessions.commit(_transaction);
+			self.browserConsoleLog("Multiplayer Recording Game Session requested", req_id);
+			self.send(req_id, "multiplayerRecordingGameSessionsRequested");
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Save Game Session
+ * @param meta_json {string} A key-value array in JSON format
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_MultiplayerSaveGameSession(meta_json) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Multiplayer Save Game Session", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let _meta = self.parseJson(meta_json);
+			self._ysdk.multiplayer.sessions.push(_meta);
+			self.browserConsoleLog("Multiplayer Save Game Session requested", req_id);
+			self.send(req_id, "multiplayerSaveGameSessionsRequested");
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
 	return req_id;

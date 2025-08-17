@@ -1,21 +1,19 @@
 {
   "$GMObject":"",
-  "%Name":"obj_button_getPlayerMode",
+  "%Name":"obj_header_multiplayer",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":7,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":70,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"obj_button_getPlayerMode",
+  "name":"obj_header_multiplayer",
   "overriddenProperties":[],
   "parent":{
-    "name":"Player",
-    "path":"folders/Objects/Buttons/Player.yy",
+    "name":"Header_text",
+    "path":"folders/Objects/Header_text.yy",
   },
   "parentObjectId":{
-    "name":"obj_childrenPlayer_parent",
-    "path":"objects/obj_childrenPlayer_parent/obj_childrenPlayer_parent.yy",
+    "name":"obj_header_parent",
+    "path":"objects/obj_header_parent/obj_header_parent.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -35,8 +33,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_button_short",
-    "path":"sprites/spr_button_short/spr_button_short.yy",
+    "name":"spr_head_text",
+    "path":"sprites/spr_head_text/spr_head_text.yy",
   },
   "spriteMaskId":null,
   "visible":true,

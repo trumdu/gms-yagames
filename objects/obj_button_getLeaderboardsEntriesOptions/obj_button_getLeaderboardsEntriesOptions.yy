@@ -15,8 +15,8 @@
     "path":"folders/Objects/Buttons/Leaderboards.yy",
   },
   "parentObjectId":{
-    "name":"obj_childrenLeaderboards_parent",
-    "path":"objects/obj_childrenLeaderboards_parent/obj_childrenLeaderboards_parent.yy",
+    "name":"obj_button_parent",
+    "path":"objects/obj_button_parent/obj_button_parent.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,

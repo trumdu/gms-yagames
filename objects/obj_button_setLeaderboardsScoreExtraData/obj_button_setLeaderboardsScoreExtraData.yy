@@ -15,8 +15,8 @@
     "path":"folders/Objects/Buttons/Leaderboards.yy",
   },
   "parentObjectId":{
-    "name":"obj_childrenLeaderboards_parent",
-    "path":"objects/obj_childrenLeaderboards_parent/obj_childrenLeaderboards_parent.yy",
+    "name":"obj_button_parent",
+    "path":"objects/obj_button_parent/obj_button_parent.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -36,8 +36,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_button_long",
-    "path":"sprites/spr_button_long/spr_button_long.yy",
+    "name":"spr_button_short",
+    "path":"sprites/spr_button_short/spr_button_short.yy",
   },
   "spriteMaskId":null,
   "visible":true,

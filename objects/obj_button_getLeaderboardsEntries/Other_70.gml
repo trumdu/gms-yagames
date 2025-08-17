@@ -30,12 +30,8 @@ if (not isMap(async_load)) {
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			
                 // Leaderboard Entries initialization error
-				
             break;
 			
-            case YaGames_CallNotLeaderboardInitSDK:
-                // Leaderboard in SDK not initialized
-            break;
             case YaGames_CallNotInitSDK:
                 // SDK not initialized
             break;

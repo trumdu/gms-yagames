@@ -9,10 +9,10 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case YaGames_CallPlayerGetMode:
-                // Player mode request success
-                var _mode = async_load[? "value"];
-				log("Mode: " + _mode);
+            case YaGames_CallPlayerIsAuthorized:
+                // Player is auth request success
+                var _st = async_load[? "value"];
+				log("Player Is Authorized: " + (_st > 0 ? "Yes" : "No"));
             break;
 			
             case YaGames_CallNotPlayerInitSDK:

@@ -9,14 +9,24 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case YaGames_CallLeaderboardsSetScore:
-                // Leaderboard score set success
+            case YaGames_CallMultiplayerSessionsInited:
+				//var _data = json_parse(async_load[? "data"]);
+				// _data[0].id
+				// _data[0].meta.meta1
+				// _data[0].meta.meta2
+				// _data[0].meta.meta3
+				// _data[0].player.avatar
+				// _data[0].player.name
+				// _data[0].timeline[0].id
+				// _data[0].timeline[0].payload 
+				// _data[0].timeline[0].time
+				
             break;
-            case YaGames_CallLeaderboardsSetScoreError:
+            case YaGames_CallMultiplayerSessionsInitError:
                 var errCode = async_load[? "code"];
                 var errName = async_load[? "name"];
                 var errMessage = async_load[? "message"];			
-                // Leaderboard score set error
+                // Init error
             break;
 			
             case YaGames_CallNotInitSDK:

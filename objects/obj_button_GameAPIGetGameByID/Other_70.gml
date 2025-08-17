@@ -29,9 +29,6 @@ if (not isMap(async_load)) {
 				// If the error message is 400 -> the game has not been published or is on another account.
             break;
 			
-            case YaGames_CallNotLeaderboardInitSDK:
-                // Leaderboard in SDK not initialized
-            break;
             case YaGames_CallNotInitSDK:
                 // SDK not initialized
             break;

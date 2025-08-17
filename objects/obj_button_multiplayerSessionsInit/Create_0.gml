@@ -1,3 +1,4 @@
 event_inherited();
-text += @"Get Mode";
+text += @"Sessions
+Init";
 msg = -1;

@@ -19,9 +19,6 @@ if (not isMap(async_load)) {
                 // Leaderboard score set error
             break;
 			
-            case YaGames_CallNotLeaderboardInitSDK:
-                // Leaderboard in SDK not initialized
-            break;
             case YaGames_CallNotInitSDK:
                 // SDK not initialized
             break;

@@ -2,6 +2,10 @@
   "$GMExtensionConfigSet": "GMExtensionConfigSet",
   "configurables": {
     "376ef55b-6b11-4791-9168-21492300d362": null,
-    "625d0765-0522-44a3-826f-65175ea6a4c8": null
+    "625d0765-0522-44a3-826f-65175ea6a4c8": {
+      "Default": {
+        "value": "/sdk.js"
+      }
+    }
   }
 }

@@ -1,15 +1,18 @@
 {
   "$GMObject":"",
-  "%Name":"obj_childrenLeaderboards_parent",
+  "%Name":"obj_button_multiplayerRecordingGameSession",
   "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":7,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":63,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":70,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"obj_childrenLeaderboards_parent",
+  "name":"obj_button_multiplayerRecordingGameSession",
   "overriddenProperties":[],
   "parent":{
-    "name":"Leaderboards",
-    "path":"folders/Objects/Buttons/Leaderboards.yy",
+    "name":"Multiplayer",
+    "path":"folders/Objects/Buttons/Multiplayer.yy",
   },
   "parentObjectId":{
     "name":"obj_button_parent",
@@ -32,7 +35,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"spr_button_short",
+    "path":"sprites/spr_button_short/spr_button_short.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

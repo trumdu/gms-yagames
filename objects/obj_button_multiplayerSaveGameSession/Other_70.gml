@@ -9,14 +9,8 @@ if (not isMap(async_load)) {
 		//
         switch (async_load[? "event"]) {	
 			
-            case YaGames_CallLeaderboardsSetScore:
-                // Leaderboard score set success
-            break;
-            case YaGames_CallLeaderboardsSetScoreError:
-                var errCode = async_load[? "code"];
-                var errName = async_load[? "name"];
-                var errMessage = async_load[? "message"];			
-                // Leaderboard score set error
+            case YaGames_CallMultiplayerSaveGameSessionsRequested:
+                // 
             break;
 			
             case YaGames_CallNotInitSDK:
