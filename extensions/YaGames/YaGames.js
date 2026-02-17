@@ -214,7 +214,7 @@ function YaGamesGMS_SdkInit() {
 		console.log('Yandex SDK initialized');
 		self._ysdk = ysdk;
 		// We show the SDK that the game has loaded and you can start playing.
-		if (YaGames_send_game_start) {
+		if (typeof YaGames_send_game_start === 'boolean' && YaGames_send_game_start === true) {
 			self._ysdk.features.LoadingAPI?.ready();
 		}
 		// Subscribing to pause events
