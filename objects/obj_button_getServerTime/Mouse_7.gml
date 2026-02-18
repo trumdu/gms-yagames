@@ -1,7 +1,7 @@
 if (is_clicked) {
 	// The function returns a timestamp in milliseconds
 	var _timestamp_ms = YaGames_getServerTime();
-	if (_timestamp == 0) {
+	if (_timestamp_ms == 0) {
 	    log("Error receiving server time");
 	}
 	else {

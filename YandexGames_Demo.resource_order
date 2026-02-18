@@ -34,6 +34,7 @@
     {"name":"Timelines","order":15,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings":[
+    {"name":"NOGX","order":2,"path":"extensions/NOGX/NOGX.yy",},
     {"name":"YaGames","order":1,"path":"extensions/YaGames/YaGames.yy",},
     {"name":"fnt_header","order":1,"path":"fonts/fnt_header/fnt_header.yy",},
     {"name":"obj_button_banner_getAdvStatus","order":2,"path":"objects/obj_button_banner_getAdvStatus/obj_button_banner_getAdvStatus.yy",},

@@ -14,8 +14,8 @@ if i_d == msg
 			};
 			var _transaction_json = json_stringify(_transaction);
 			req_id = YaGames_MultiplayerRecordingGameSession(_transaction_json);
-			var msg = "Multiplayer Recording Game Session reqId: " + string(req_id);
-		    log(msg);
+			var _msg = "Multiplayer Recording Game Session reqId: " + string(req_id);
+		    log(_msg);
         }
     }
 } 

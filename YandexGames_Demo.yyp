@@ -48,11 +48,12 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.8.1.171",
+    "IDEVersion":"2024.14.2.213",
   },
   "name":"YandexGames_Demo",
   "resources":[
     {"id":{"name":"browser_hdpi","path":"extensions/browser_hdpi/browser_hdpi.yy",},},
+    {"id":{"name":"NOGX","path":"extensions/NOGX/NOGX.yy",},},
     {"id":{"name":"YaGames","path":"extensions/YaGames/YaGames.yy",},},
     {"id":{"name":"fnt_header","path":"fonts/fnt_header/fnt_header.yy",},},
     {"id":{"name":"fnt_normal","path":"fonts/fnt_normal/fnt_normal.yy",},},

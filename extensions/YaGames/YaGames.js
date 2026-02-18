@@ -711,6 +711,60 @@ function YaGamesGML_getEnvironment() {
 				envDt = self._ysdk.environment;
 				console.error(err);
 			}
+
+			try {
+				// URL params
+				let params = {};
+				let searchParams = new URLSearchParams(window.location.search);
+
+				for (let [key, raw] of searchParams.entries()) {
+					let value = raw.trim();
+					if (value === '') {
+						params[key] = null;
+						continue;
+					}
+					if (value === 'true' || value === 'false') {
+						params[key] = value === 'true';
+						continue;
+					}
+					if (/^-?\d+(\.\d+)?$/.test(value)) {
+						params[key] = Number(value);
+						continue;
+					}
+					params[key] = value;
+				}
+
+				envDt.url_params = params;
+
+				// Embed / sandbox detection
+				let isEmbedded = false;
+				let isSandboxed = false;
+
+				try {
+					isEmbedded = window.self !== window.top;
+				} catch (e) {
+					isEmbedded = true;
+					isSandboxed = true;
+				}
+
+				try {
+					if (window.frameElement && window.frameElement.hasAttribute('sandbox')) {
+						isSandboxed = true;
+					}
+				} catch (e) {
+					isSandboxed = true;
+				}
+
+				envDt.embed_info = {
+					isEmbedded,
+					isSandboxed,
+					referrer: document.referrer || null
+				};
+			}
+			catch (err) {
+				console.error(err);
+			}
+
 			self.browserConsoleLog("Environment", req_id, envDt);
 			self.send(req_id, "environment", envDt);
 		} catch (err) {

@@ -13,8 +13,8 @@ if i_d == msg
 			};
 			var _meta_json = json_stringify(_meta);
 			req_id = YaGames_MultiplayerSaveGameSession(_meta_json);
-			var msg = "Multiplayer Save Game Session reqId: " + string(req_id);
-		    log(msg);
+			var _msg = "Multiplayer Save Game Session reqId: " + string(req_id);
+		    log(_msg);
         }
     }
 } 

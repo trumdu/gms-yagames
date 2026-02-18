@@ -7,8 +7,8 @@ if i_d == msg
         {
 			var txt = ds_map_find_value(async_load, "result");
 			req_id = YaGames_Payments_Purchase(txt, "purchase_sign");
-			var msg = "Purchase request reqId: " + string(req_id);
-		    log(msg);
+			var _msg = "Purchase request reqId: " + string(req_id);
+		    log(_msg);
         }
     }
 } 
