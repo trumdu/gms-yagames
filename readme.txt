@@ -8,3 +8,6 @@
 SDK не работает вне Яндекс игр и будет возвращать ошибку.
 
 Провести тест: https://yandex.ru/games/app/179241?draft=true&lang=ru
+
+Минимальная версия IDE 2024.14.2.213 (Runtime 2024.14.2.256).
+Для сборки на WASM используйте плагин https://github.com/Nijakkuro/NOGX
