@@ -1,137 +1,711 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-  <!-- Custom PreHead code is injected here -->
-  ${GM_HTML5_PreHead}
+${GM_HTML5_PreHead}
 <head>
   <meta charset="UTF-8" />
-  <meta name ="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>${GM_HTML5_BrowserTitle}</title>
-  <!-- Custom PreStyle code is injected here -->
+  <link rel="shortcut icon" href="html5game/icon.png">
   ${GM_HTML5_PreStyle}
+
   <style>
-    html {
-      height: 100%
-    }
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      background-color: black;
-      background-image: linear-gradient(to top, #20375a, #245076, #276b92, #2987ac, #2fa4c4);
-      font-family: sans-serif;
-      color: white;
+      width: 100%;
       height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
       overflow: hidden;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
+      background: linear-gradient(to top, #20375a, #245076, #276b92, #2987ac, #2fa4c4);
+      font-family: sans-serif;
     }
-    #status {
-      font-size: 18px;
-      margin-top: 20px;
-    }
+
     canvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      
+      max-width: 100vw;
+      max-height: 100vh;
+
       display: none;
       image-rendering: optimizeSpeed;
-      -webkit-interpolation-mode: nearest-neighbor;
-      -ms-touch-action: none;
       touch-action: none;
-      margin: 0px;
-      padding: 0px;
-      border: 0px;
-      box-shadow: 0px 0px 4em rgba(0, 0, 0, 0.5);
+
+      box-shadow: 0 0 4em rgba(0,0,0,0.5);
+      z-index: 1;
+    }
+
+    #status {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 18px;
+    }
+
+    .progress-bar {
+      position: absolute;
+      top: calc(50% + 30px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 256px;
+      height: 24px;
+
+      background: linear-gradient(
+        to right,
+        #a3e3ff 0%,
+        #ffffff var(--progress),
+        #23395c var(--progress),
+        #23395c 100%
+      );
+
+      border-radius: 8px;
+    }
+
+    /* fix for GamePush background */
+    .gp-custom-background {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 0 !important;
+      pointer-events: none;
     }
   </style>
-  <!-- Custom PostStyle code is injected here -->
+
   ${GM_HTML5_PostStyle}
 </head>
-<!-- Custom PostHead code is injected here -->
+
 ${GM_HTML5_PostHead}
-<!-- Custom PreBody code is injected here -->
 ${GM_HTML5_PreBody}
 <body>
-  <canvas id="canvas" width="640" height="360" tabindex="-1" style="position: absolute; top: 50%; left: 50%; bottom: -50%; right: -50%; transform: translate(-50%, -50%);">
-  <div id="status">...</div>
+	<script>
+	window.__NOGX_LOAD_DEBUG = "${YYEXTOPT_NOGX_EnableLoadDebug}" === "True";
+	window.__NOGX_LOAD_STAGE = "Initializing";
+	window.nogxSetLoadStage = function (stage) {
+		window.__NOGX_LOAD_STAGE = stage;
+		if (!window.__NOGX_LOAD_DEBUG) {
+			return;
+		}
+		const statusElement = document.getElementById("status");
+		if (statusElement) {
+			statusElement.textContent = stage;
+		}
+	};
+	window.nogxSupportsWasmExceptionHandling = function () {
+		return (
+			typeof WebAssembly === "object" &&
+			typeof WebAssembly.Tag === "function" &&
+			typeof WebAssembly.Exception === "function"
+		);
+	};
+	window.nogxIsWasmExceptionHandlingError = function (error) {
+		if (!error) {
+			return false;
+		}
+		const message = String(error.message || error).toLowerCase();
+		return (
+			error.name === "CompileError" &&
+			(
+				message.includes("unexpected section <exception>") ||
+				message.includes("experimental-wasm-eh")
+			)
+		);
+	};
+	window.nogxShowUnsupportedRuntime = function () {
+		const statusElement = document.getElementById("status");
+		const progressElement = document.getElementById("loadingProgress");
+		if (progressElement) {
+			progressElement.style.display = "none";
+		}
+		if (!statusElement) {
+			return;
+		}
+		statusElement.style.display = "block";
+		statusElement.textContent = window.__NOGX_LOAD_DEBUG
+			? "WebAssembly Exception Handling required (Android WebView 95+)"
+			: (
+				typeof window.nogxGetUnsupportedRuntimeMessage === "function"
+					? window.nogxGetUnsupportedRuntimeMessage()
+					: "Your browser is outdated. Update it to run this game."
+			);
+	};
+	window.nogxTryHtml5BuildFallback = async function () {
+		if (window.__NOGX_HTML5_FALLBACK_TRIED) {
+			return false;
+		}
+		if (/\/html5build(?:\/|$)/i.test(location.pathname)) {
+			return false;
+		}
+		window.__NOGX_HTML5_FALLBACK_TRIED = true;
+		try {
+			let response = await fetch("html5build/index.html", {
+				method: "HEAD",
+				cache: "no-store"
+			});
+			if (!response.ok || response.status === 405) {
+				response = await fetch("html5build/index.html", {
+					method: "GET",
+					cache: "no-store"
+				});
+			}
+			if (!response.ok) {
+				return false;
+			}
+			location.replace(
+				"html5build/index.html" + location.search + location.hash
+			);
+			return true;
+		} catch (_) {
+			return false;
+		}
+	};
+	</script>
+
+	<!-- NOGX_CODE_COMPRESSION_START -->
+	<script>
+	window.Module = window.Module || {};
+	Module.instantiateWasm = function (imports, successCallback) {
+		function prepareWasmImports(wasmImports) {
+			if (wasmImports && wasmImports.a && wasmImports.a.Yv !== undefined) {
+				wasmImports.a.Ya = wasmImports.a.Yv;
+			}
+			return wasmImports;
+		}
+
+		function formatLoadError(error) {
+			const name = error && error.name ? error.name : "Error";
+			const message = error && error.message
+				? String(error.message).replace(/\s+/g, " ").trim()
+				: "";
+			if (!message || message === name) {
+				return name;
+			}
+			return name + ": " + message.slice(0, 120);
+		}
+
+		function waitForNextTask() {
+			return new Promise(resolve => setTimeout(resolve, 0));
+		}
+
+		(async () => {
+			const wasmImports = prepareWasmImports(imports);
+
+			async function loadNormalWasm() {
+				console.warn("Loading fallback wasm");
+				window.nogxSetLoadStage("Fetching fallback WASM");
+				let response = await fetch("runner.wasm");
+				if (!response.ok) {
+					throw new Error("Fallback wasm not found");
+				}
+
+				let result;
+				if (
+					typeof WebAssembly.instantiateStreaming === "function" &&
+					response.body
+				) {
+					try {
+						window.nogxSetLoadStage("Instantiating fallback WASM");
+						result = await WebAssembly.instantiateStreaming(
+							response,
+							wasmImports
+						);
+					} catch (streamError) {
+						console.warn("Fallback WASM streaming failed", streamError);
+						response = null;
+						if (!streamError || streamError.name !== "TypeError") {
+							throw streamError;
+						}
+						await waitForNextTask();
+						window.nogxSetLoadStage("Retrying fallback WASM");
+						response = await fetch("runner.wasm");
+						if (!response.ok) {
+							throw new Error("Fallback wasm retry not found");
+						}
+					}
+				}
+
+				if (!result) {
+					window.nogxSetLoadStage("Compiling fallback WASM");
+					const wasmBinary = new Uint8Array(await response.arrayBuffer());
+					response = null;
+					result = await WebAssembly.instantiate(wasmBinary, wasmImports);
+				}
+
+				successCallback(result.instance);
+			}
+
+			try {
+				const canStreamCompressed =
+					typeof DecompressionStream === "function" &&
+					typeof WebAssembly.instantiateStreaming === "function" &&
+					typeof Response === "function" &&
+					Response.prototype &&
+					"body" in Response.prototype;
+
+				if (!canStreamCompressed) {
+					window.nogxSetLoadStage("Compressed streaming unavailable");
+					await loadNormalWasm();
+					return;
+				}
+
+				let compressedResponse = null;
+				let wasmStream = null;
+				let wasmResponse = null;
+				try {
+					window.nogxSetLoadStage("Fetching compressed WASM");
+					compressedResponse = await fetch("runner.wbin");
+					if (!compressedResponse.ok || !compressedResponse.body) {
+						throw new Error("Compressed wasm stream not found");
+					}
+
+					window.nogxSetLoadStage("Streaming compressed WASM");
+					wasmStream = compressedResponse.body.pipeThrough(
+						new DecompressionStream("gzip")
+					);
+					compressedResponse = null;
+					wasmResponse = new Response(wasmStream, {
+						headers: { "Content-Type": "application/wasm" }
+					});
+					wasmStream = null;
+
+					window.nogxSetLoadStage("Instantiating compressed WASM");
+					const result = await WebAssembly.instantiateStreaming(
+						wasmResponse,
+						wasmImports
+					);
+					wasmResponse = null;
+					console.log("Compressed WASM loaded from runner.wbin");
+					successCallback(result.instance);
+				} catch (compressedError) {
+					console.warn("Compressed wasm failed", compressedError);
+					compressedResponse = null;
+					wasmStream = null;
+					wasmResponse = null;
+					if (window.nogxIsWasmExceptionHandlingError(compressedError)) {
+						if (await window.nogxTryHtml5BuildFallback()) {
+							return;
+						}
+						window.nogxShowUnsupportedRuntime();
+						return;
+					}
+					window.nogxSetLoadStage("Falling back to runner.wasm");
+					await waitForNextTask();
+					await loadNormalWasm();
+				}
+			} catch (err) {
+				console.error("WASM load failed", err);
+				if (await window.nogxTryHtml5BuildFallback()) {
+					return;
+				}
+				if (window.nogxIsWasmExceptionHandlingError(err)) {
+					window.nogxShowUnsupportedRuntime();
+					return;
+				}
+				window.nogxSetLoadStage(
+					"WASM load failed: " + formatLoadError(err)
+				);
+			}
+		})();
+		return {};
+	};
+	</script>
+	<!-- NOGX_CODE_COMPRESSION_END -->
+
+	<script>
+	(function () {
+		const _origLog = console.log;
+		console.log = function () {
+			let s = "";
+			for(let i = 0; i < arguments.length; i++) {
+				try { s += arguments[i]; } catch (_) {}
+				if (i + 1 < arguments.length) s += " ";
+			}
+			s = s.trim();
+			if (!s || s === "<empty string>" ||
+				(
+					s.includes("Prevented call into an uninitialised yyal") &&
+					s.includes("Audio_EngineInvokeCallback")
+				)
+			) { return; }
+			return _origLog.apply(console, arguments);
+		};
+		window.alert = function(msg) {
+			console.error('[GM alert]', msg);
+			try { window.parent.postMessage({ type: 'gm-alert', msg }, '*'); } catch(e) {}
+		};
+		window.onerror = function(msg, src, line, col, err) {
+			console.error('[onerror]', msg, src + ':' + line);
+			try { window.parent.postMessage({ type: 'onerror', msg, src, line }, '*'); } catch(e) {}
+		};
+		window.onunhandledrejection = function(e) {
+			console.error('[unhandledrejection]', e.reason);
+		};
+	})();
+
+	(function () {
+		const AC = window.AudioContext || window.webkitAudioContext;
+		if (!AC) {
+			console.warn("AudioContext not supported");
+			return;
+		}
+		if (window.__GXGameAudioPatch && typeof window.__GXGameAudioPatch.teardown === "function") {
+			try { window.__GXGameAudioPatch.teardown(); } catch (e0) {}
+		}
+		let unlocked = false;
+		const contexts = new Set();
+		const pendingTimeouts = [];
+		const EVENTS = [
+			'pointerdown',
+			'pointerup',
+			'touchstart',
+			'touchend',
+			'mousedown',
+			'mouseup',
+			'click',
+			'keydown'
+		];
+		function clearPendingTimeouts() {
+			while (pendingTimeouts.length) {
+				const id = pendingTimeouts.pop();
+				try { clearTimeout(id); } catch (e) {}
+			}
+		}
+		async function resumeContext(ctx) {
+			if (!ctx) return;
+			try {
+				if (ctx.state !== 'running' && ctx.state !== 'closed') {
+					await ctx.resume();
+				}
+			} catch (e) {}
+		}
+		function scheduleResume(ctx, ms) {
+			const id = setTimeout(function () { resumeContext(ctx); }, ms);
+			pendingTimeouts.push(id);
+		}
+		async function unlockAllAudio() {
+			if (unlocked) return;
+			unlocked = true;
+			removeListeners();
+			clearPendingTimeouts();
+			for (const ctx of contexts) {
+				await resumeContext(ctx);
+				scheduleResume(ctx, 0);
+				scheduleResume(ctx, 100);
+				scheduleResume(ctx, 500);
+			}
+		}
+		function addListeners() {
+			EVENTS.forEach(type => {
+				document.addEventListener(type, unlockAllAudio, {
+					capture: true,
+					passive: false
+				});
+				window.addEventListener(type, unlockAllAudio, {
+					capture: true,
+					passive: false
+				});
+			});
+		}
+		function removeListeners() {
+			EVENTS.forEach(type => {
+				document.removeEventListener(type, unlockAllAudio, true);
+				window.removeEventListener(type, unlockAllAudio, true);
+			});
+		}
+		const origClose = (typeof AC.prototype.close === "function") ? AC.prototype.close : null;
+		class PatchedAudioContext extends AC {
+			constructor(...args) {
+				super(...args);
+				contexts.add(this);
+				Promise.resolve().then(() => resumeContext(this));
+				scheduleResume(this, 0);
+				scheduleResume(this, 50);
+				scheduleResume(this, 250);
+			}
+			close() {
+				try { contexts.delete(this); } catch (e) {}
+				return origClose ? origClose.apply(this, arguments) : undefined;
+			}
+		}
+		window.AudioContext = PatchedAudioContext;
+		if (window.webkitAudioContext) {
+			window.webkitAudioContext = PatchedAudioContext;
+		}
+		function onWindowMessage(event) {
+			if (event.data === 'yt-playable-user-gesture') {
+				unlocked = false;
+				unlockAllAudio();
+			}
+		}
+		window.addEventListener('message', onWindowMessage);
+		let tornDown = false;
+		function teardown() {
+			if (tornDown) return;
+			tornDown = true;
+			removeListeners();
+			clearPendingTimeouts();
+			try { window.removeEventListener('message', onWindowMessage); } catch (e2) {}
+			contexts.forEach(function (ctx) {
+				try {
+					if (ctx && ctx.state !== 'closed') { ctx.suspend(); }
+				} catch (e4) {}
+			});
+			contexts.clear();
+			try { window.AudioContext = AC; } catch (e5) {}
+			try { if (window.webkitAudioContext) { window.webkitAudioContext = AC; } } catch (e6) {}
+			unlocked = false;
+			try { delete window.__GXGameAudioPatch; } catch (e8) {}
+		}
+		try {
+			window.addEventListener('pagehide', teardown, { capture: true });
+			window.addEventListener('freeze', teardown, { capture: true });
+			window.addEventListener('unload', teardown, { capture: true });
+		} catch (e7) {}
+		window.__GXGameAudioPatch = { teardown: teardown };
+
+		addListeners();
+		console.log("GXGame Audio Unlock Patch installed");
+	})();
+	</script>
+
+  <canvas id="canvas" width="${GM_HTML5_GameWidth}" height="${GM_HTML5_GameHeight}" ${GM_HTML5_InjectCenterStyle}>
+	<p>Your browser doesn't support HTML5 canvas.</p>
+  </canvas>
+
+  <div id="status">0%</div>
+  <div class="progress-bar" id="loadingProgress"></div>
 
   <script>
-    var Module = {
-      canvas: document.getElementById("canvas"),
-      setStatus: function(text) {
-        document.getElementById("status").textContent = text || "";
-        if (!text) {
-          document.getElementById("canvas").style.display = "block";
-          document.getElementById("status").style.display = "none";
-        }
-      },
-      totalDependencies: 0,
-      monitorRunDependencies: function(left) {
-        this.totalDependencies = Math.max(this.totalDependencies, left);
-        Module.setStatus(left ? "(" + (this.totalDependencies - left) + "/" + this.totalDependencies + ")" : "");
-      }
-    };
+	window.nogxSetLoadStage(window.__NOGX_LOAD_STAGE || "Initializing");
 
-    // functions for runner.js
-    var g_pWadLoadCallback = undefined;
-    function setWadLoadCallback( _wadLoadCallback ) { g_pWadLoadCallback = _wadLoadCallback; }
+	var Module = window.Module || {};
+	Object.assign(Module, {
+	  canvas: document.getElementById("canvas"),
+	  _startTime: null,
+	  _progressTimer: null,
+	  _totalDeps: 0,
+	  
+	  show: function () {
+		Module.canvas.style.display = "block";
+		document.getElementById("status").style.display = "none";
+		document.getElementById("loadingProgress").style.display = "none";
+	  },
+	  
+	  setStatus: function (text) {
+		if (text === "Running..." || text === "") return;
+		if (window.__NOGX_LOAD_DEBUG) return;
+		document.getElementById("status").textContent = text || "";
+	  },
+	  
+	  _updateProgressUI: function (value) {
+		const clamped = Math.max(0, Math.min(90, value));
+		const progress = Math.floor(clamped) + "%";
+		const progressElem = document.getElementById("loadingProgress");
+		if (progressElem) {
+		  progressElem.style.setProperty("--progress", progress);
+		}
+		if (!window.__NOGX_LOAD_DEBUG) {
+		  this.setStatus(progress);
+		}
+	  },
+	  
+	  _computeFakeProgress: function () {
+		if (this._startTime === null) return 0;
+		const elapsed = Date.now() - this._startTime;
+		let p = (elapsed / 30000) * 90;
+		if (this.totalDependencies <= 3) {
+		  p = Math.max(p, 86);
+		}
+		return Math.min(90, p);
+	  },
+	  
+	  monitorRunDependencies: function (left) {
+		this._totalDeps = Math.max(this._totalDeps, left);
+		if (this._startTime === null) {
+		  window.nogxSetLoadStage("Loading dependencies");
+		  this._startTime = Date.now();
+		  this._progressTimer = setInterval(() => {
+			const p = this._computeFakeProgress();
+			this._updateProgressUI(p);
+			if (p >= 90) {
+			  clearInterval(this._progressTimer);
+			  this._progressTimer = null;
+			}
+		  }, 100);
+		}
+		const p = this._computeFakeProgress();
+		this._updateProgressUI(p);
+	  }
+	});
+
+    Module.canvas.style.display = "none";
+
+    /* ===== GameMaker hooks ===== */
+
+    var g_pWadLoadCallback;
+    function setWadLoadCallback(cb) { g_pWadLoadCallback = cb; }
 
     var g_pAddAsyncMethod = -1;
-    function setAddAsyncMethod( asyncMethod ) { g_pAddAsyncMethod = asyncMethod; }
+    function setAddAsyncMethod(m) { g_pAddAsyncMethod = m; }
 
-    var g_pJSExceptionHandler = undefined;
-    function setJSExceptionHandler( exceptionHandler ) {
-      if (typeof exceptionHandler == "function") {
-          g_pJSExceptionHandler = exceptionHandler;
-      }
+    var g_pJSExceptionHandler;
+    function setJSExceptionHandler(handler) {
+      if (typeof handler === "function") g_pJSExceptionHandler = handler;
     }
 
     function hasJSExceptionHandler() {
-      return (g_pJSExceptionHandler != undefined) && (typeof g_pJSExceptionHandler == "function");
+      return typeof g_pJSExceptionHandler === "function";
     }
 
-    function doJSExceptionHandler( exceptionJSON ) {
-      if (typeof g_pJSExceptionHandler == "function") {
-        const exception = JSON.parse( exceptionJSON );
-        g_pJSExceptionHandler( exception );
+    function doJSExceptionHandler(json) {
+      if (g_pJSExceptionHandler) {
+        g_pJSExceptionHandler(JSON.parse(json));
       }
     }
 
-    function manifestFiles() { return [ "runner.data", "runner.js", "runner.wasm", "audio-worklet.js", "game.unx", "options.ini" ].join( ";"); }
-    function manifestFilesMD5() { console.log("manifestFilesMD5 called"); return undefined; }
-
-    function onFirstFrameRendered() {
-      console.log("-------------First frame rendered!-----------");
+    function manifestFiles() {
+      return [
+        "runner.data",
+        "runner.js",
+        "runner.wasm",
+        "audio-worklet.js",
+        "game.unx",
+        "options.ini"
+      ].join(";");
     }
 
-    function onGameSetWindowSize(width, height) {}
+    function manifestFilesMD5() {
+      return undefined;
+    }
 
+    function onFirstFrameRendered() {
+      console.log("First frame rendered");
+      window.nogxSetLoadStage("First frame rendered");
+      Module.show();
+    }
+
+    function onGameSetWindowSize() {}
+
+    /* resize observer (GameMaker) */
     var __NOGX_ready = false;
+
     function updateCanvasSize() {
-      if(__NOGX_ready) {
+      if (__NOGX_ready) {
         __NOGX_update_canvas_size();
       }
     }
-    const resizeObserver = new ResizeObserver(() => window.requestAnimationFrame(updateCanvasSize));
+
+    const resizeObserver = new ResizeObserver(() =>
+      window.requestAnimationFrame(updateCanvasSize)
+    );
+
     resizeObserver.observe(document.body);
 
-    // disable context menu
-    document.addEventListener('contextmenu', (event) => {
-      event.preventDefault();
-    });
+    /* disable context menu */
+    document.addEventListener("contextmenu", e => e.preventDefault());
 
-    document.addEventListener('touchstart', (event) => {
-      const canvasElem = document.getElementById('canvas');
-      if(event.target===document.body || event.target===canvasElem) {
-        event.preventDefault();
+    document.addEventListener("touchstart", e => {
+      if (e.target === document.body || e.target === Module.canvas) {
+        e.preventDefault();
       }
     }, { passive: false });
+
   </script>
-  <script async src="runner.js"></script>
+  
+  <script>
+	  const WAIT_MESSAGES = {
+		en: "Waiting for window",
+		ru: "Ожидание окна",
+		zh: "等待窗口",
+		es: "Esperando la ventana",
+		hi: "विंडो की प्रतीक्षा",
+		ar: "في انتظار النافذة",
+		pt: "Aguardando a janela",
+		fr: "En attente de la fenêtre",
+		de: "Warte auf Fenster",
+		ja: "ウィンドウを待っています",
+		ko: "창을 기다리는 중",
+	  };
+
+	  const UNSUPPORTED_RUNTIME_MESSAGES = {
+		en: "Your browser is outdated. Update it to run this game.",
+		ru: "Ваш браузер устарел. Обновите его, чтобы запустить игру.",
+		zh: "您的浏览器版本过旧。请更新后再运行游戏。",
+		es: "Tu navegador está desactualizado. Actualízalo para ejecutar el juego.",
+		hi: "आपका ब्राउज़र पुराना है। गेम चलाने के लिए इसे अपडेट करें।",
+		ar: "متصفحك قديم. حدّثه لتشغيل اللعبة.",
+		pt: "Seu navegador está desatualizado. Atualize-o para executar o jogo.",
+		fr: "Votre navigateur est obsolète. Mettez-le à jour pour lancer le jeu.",
+		de: "Ihr Browser ist veraltet. Aktualisieren Sie ihn, um das Spiel zu starten.",
+		ja: "ブラウザーが古いため、ゲームを起動できません。更新してください。",
+		ko: "브라우저가 오래되었습니다. 게임을 실행하려면 업데이트하세요.",
+	  };
+
+	  function getLocalizedMessage(messages) {
+		const langs = navigator.languages || [navigator.language || "en"];
+		for (const lang of langs) {
+		  const code = lang.split("-")[0].toLowerCase();
+		  if (messages[code]) return messages[code];
+		}
+		return messages.en;
+	  }
+
+	  function getWaitMessage() {
+		return getLocalizedMessage(WAIT_MESSAGES);
+	  }
+
+	  window.nogxGetUnsupportedRuntimeMessage = function () {
+		return getLocalizedMessage(UNSUPPORTED_RUNTIME_MESSAGES);
+	  };
+
+	  function waitForSize(callback) {
+		const base = getWaitMessage();
+		const statusEl = document.getElementById("status");
+		let frame = 0;
+		const DOTS = ["", ".", "..", "..."];
+		const CYCLE = 30;
+
+		window.nogxSetLoadStage("Waiting for window");
+
+		function check() {
+		  if (window.innerWidth > 0 && window.innerHeight > 0) {
+			if (window.__NOGX_LOAD_DEBUG) {
+			  window.nogxSetLoadStage("Loading runtime");
+			} else {
+			  statusEl.textContent = "0%";
+			}
+			callback();
+		  } else {
+			if (window.__NOGX_LOAD_DEBUG) {
+			  window.nogxSetLoadStage(
+				"Waiting for window" + DOTS[Math.floor(frame / CYCLE) % DOTS.length]
+			  );
+			} else {
+			  statusEl.textContent = base + DOTS[Math.floor(frame / CYCLE) % DOTS.length];
+			}
+			frame++;
+			requestAnimationFrame(check);
+		  }
+		}
+		check();
+	  }
+
+	  waitForSize(async function () {
+		if (!window.nogxSupportsWasmExceptionHandling()) {
+		  if (await window.nogxTryHtml5BuildFallback()) {
+			return;
+		  }
+		  window.nogxShowUnsupportedRuntime();
+		  return;
+		}
+		const script = document.createElement("script");
+		script.src = "runner.js";
+		document.body.appendChild(script);
+	  });
+	</script>
+
 </body>
-<!-- Custom PostBody code is injected here -->
+
 ${GM_HTML5_PostBody}
 </html>

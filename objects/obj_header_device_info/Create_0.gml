@@ -1,2 +1,2 @@
 event_inherited();
-text = string_upper("device info");
+text = string_upper("device");

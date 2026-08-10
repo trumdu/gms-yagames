@@ -4,11 +4,13 @@ $ErrorActionPreference = "Stop"
 # Get environment variables from GameMaker Studio
 $YYPLATFORM_name = $env:YYPLATFORM_name
 $YYtargetFile = $env:YYtargetFile
+$YYtargetType = $env:YYtargetType
 $YYprojectName = $env:YYprojectName
 $YYTARGET_runtime = $env:YYTARGET_runtime
 $YYtempFolder = $env:YYtempFolder
 $YYEXTOPT_NOGX_Enable = $env:YYEXTOPT_NOGX_Enable
 $YYEXTOPT_NOGX_YaFix = $env:YYEXTOPT_NOGX_YaFix
+$YYEXTOPT_NOGX_ReplaceAlertOnError = $env:YYEXTOPT_NOGX_ReplaceAlertOnError
 
 Write-Host "[NOGX] post_package_step"
 
@@ -18,12 +20,13 @@ if ($YYEXTOPT_NOGX_Enable -ne "True") {
 	exit 0
 }
 
-# Check if the current platform is Opera GX
 Write-Host "[NOGX] Current platform: $YYPLATFORM_name"
 
+# Check if the current platform is Opera GX or HTML5
 $isOperaGxPlatform = $YYPLATFORM_name -ieq "Opera GX" -or $YYPLATFORM_name -ieq "operagx"
-if (-not $isOperaGxPlatform) {
-	Write-Host "[NOGX] Aborting: This script is only for Opera GX platform."
+$isHTML5 = $YYPLATFORM_name -ieq "html5"
+if (-not ($isOperaGxPlatform -or $isHTML5)) {
+	Write-Host "[NOGX] Aborting: This script is only for Opera GX and HTML5 platform."
 	exit 0
 }
 
@@ -45,21 +48,6 @@ if ([string]::IsNullOrWhiteSpace($YYTARGET_runtime)) {
 
 if ([string]::IsNullOrWhiteSpace($YYtempFolder)) {
 	Write-Error "[NOGX] ERROR: YYtempFolder environment variable is not set."
-	exit 1
-}
-
-# Define directory paths
-$webfilesDir = [System.IO.Path]::Combine($PSScriptRoot, "..", "..", "webfiles")
-$webfilesDir = [System.IO.Path]::GetFullPath($webfilesDir)
-
-Write-Host "[NOGX] Project name: $YYprojectName"
-Write-Host "[NOGX] Target runtime: $YYTARGET_runtime"
-Write-Host "[NOGX] Target file: $YYtargetFile"
-Write-Host "[NOGX] Webfiles dir: $webfilesDir"
-
-# Validate that target file exists
-if (-not (Test-Path -Path $YYtargetFile -PathType Leaf)) {
-	Write-Error "[NOGX] ERROR: Target file not found: '$YYtargetFile'"
 	exit 1
 }
 
@@ -142,144 +130,410 @@ function RenameFile-Zip {
 	}
 }
 
+<#
+.SYNOPSIS
+    Resolves path to 7z.exe using extension option, environment variables, and defaults.
+#>
+function Get-NOGXSevenZipPath {
+	$candidates = @()
+	
+	if (-not [string]::IsNullOrWhiteSpace($env:YYEXTOPT_NOGX_SevenZipPath)) {
+		$candidates += $env:YYEXTOPT_NOGX_SevenZipPath
+	}
+	
+	foreach ($envName in @('SEVEN_ZIP', '7ZIP', '7Z_HOME', '7ZIP_HOME')) {
+		$envValue = (Get-Item "env:$envName" -ErrorAction SilentlyContinue).Value
+		if ([string]::IsNullOrWhiteSpace($envValue)) {
+			continue
+		}
+		
+		if ($envName -match 'HOME$' -and -not $envValue.EndsWith('.exe', [System.StringComparison]::OrdinalIgnoreCase)) {
+			$candidates += [System.IO.Path]::Combine($envValue, "7z.exe")
+		}
+		else {
+			$candidates += $envValue
+		}
+	}
+	
+	$candidates += @(
+		"C:\Program Files\7-Zip\7z.exe",
+		"C:\Program Files (x86)\7-Zip\7z.exe"
+	)
+	
+	foreach ($candidate in $candidates) {
+		if ([string]::IsNullOrWhiteSpace($candidate)) {
+			continue
+		}
+		
+		$resolvedPath = $candidate
+		if (-not [System.IO.Path]::IsPathRooted($resolvedPath)) {
+			$resolvedPath = [System.IO.Path]::GetFullPath($resolvedPath)
+		}
+		
+		if (Test-Path -Path $resolvedPath -PathType Leaf) {
+			Write-Host "[NOGX] Using 7-Zip: '$resolvedPath'"
+			return $resolvedPath
+		}
+	}
+	
+	Write-Host "[NOGX] 7-Zip not found. runner.wbin will not be created."
+	return $null
+}
+
+<#
+.SYNOPSIS
+    Creates runner.wbin (gzip-compressed runner.wasm) in a build output directory.
+#>
+function Compress-NOGXRunnerWasm {
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory)]
+		[string]$TargetDir
+	)
+	
+	if ($env:YYEXTOPT_NOGX_EnableCodeCompression -ne "True") {
+		Write-Host "[NOGX] Code compression is disabled. Skipping runner.wbin creation."
+		return
+	}
+	
+	$sevenZip = Get-NOGXSevenZipPath
+	if ($null -eq $sevenZip) {
+		return
+	}
+	
+	$wasmFile = [System.IO.Path]::Combine($TargetDir, "runner.wasm")
+	if (-not (Test-Path -Path $wasmFile -PathType Leaf)) {
+		Write-Host "[NOGX] runner.wasm not found in '$TargetDir'. Skipping compressed wasm creation."
+		return
+	}
+	
+	$wbinFile = [System.IO.Path]::Combine($TargetDir, "runner.wbin")
+	$legacyGzFile = [System.IO.Path]::Combine($TargetDir, "runner.wasm.gz")
+	foreach ($oldFile in @($wbinFile, $legacyGzFile)) {
+		if (Test-Path -Path $oldFile -PathType Leaf) {
+			Remove-Item -Path $oldFile -Force -ErrorAction SilentlyContinue
+		}
+	}
+	
+	Write-Host "[NOGX] Creating 'runner.wbin' from 'runner.wasm'"
+	try {
+		& $sevenZip @('a', '-tgzip', '-mx=7', '-y', $wbinFile, $wasmFile) | ForEach-Object { Write-Host "[NOGX] $_" }
+		if ($LASTEXITCODE -ne 0) {
+			Write-Host "[NOGX] WARNING: 7-Zip failed to create runner.wbin (exit code $LASTEXITCODE)."
+			if (Test-Path -Path $wbinFile -PathType Leaf) {
+				Remove-Item -Path $wbinFile -Force -ErrorAction SilentlyContinue
+			}
+			return
+		}
+		
+		Write-Host "[NOGX] Created '$wbinFile'"
+	}
+	catch {
+		Write-Host "[NOGX] WARNING: Failed to create runner.wbin: $_"
+		if (Test-Path -Path $wbinFile -PathType Leaf) {
+			Remove-Item -Path $wbinFile -Force -ErrorAction SilentlyContinue
+		}
+	}
+}
+
+<#
+.SYNOPSIS
+    Creates runner.wbin (gzip-compressed runner.wasm) inside a ZIP archive.
+#>
+function Compress-NOGXRunnerWasmInZip {
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory)]
+		[System.IO.Compression.ZipArchive]$Zip
+	)
+	
+	if ($env:YYEXTOPT_NOGX_EnableCodeCompression -ne "True") {
+		Write-Host "[NOGX] Code compression is disabled. Skipping runner.wbin creation."
+		return
+	}
+	
+	$sevenZip = Get-NOGXSevenZipPath
+	if ($null -eq $sevenZip) {
+		return
+	}
+	
+	$wasmEntry = $Zip.GetEntry("runner.wasm")
+	if ($null -eq $wasmEntry) {
+		Write-Host "[NOGX] runner.wasm not found in ZIP. Skipping compressed wasm creation."
+		return
+	}
+	
+	$tempDir = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), "NOGX_" + [Guid]::NewGuid().ToString())
+	New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+	
+	try {
+		$wasmFile = [System.IO.Path]::Combine($tempDir, "runner.wasm")
+		$wbinFile = [System.IO.Path]::Combine($tempDir, "runner.wbin")
+		
+		[System.IO.Compression.ZipFileExtensions]::ExtractToFile($wasmEntry, $wasmFile, $true)
+		
+		Write-Host "[NOGX] Creating 'runner.wbin' from 'runner.wasm'"
+		& $sevenZip @('a', '-tgzip', '-mx=7', '-y', $wbinFile, $wasmFile) | ForEach-Object { Write-Host "[NOGX] $_" }
+		if ($LASTEXITCODE -ne 0) {
+			Write-Host "[NOGX] WARNING: 7-Zip failed to create runner.wbin (exit code $LASTEXITCODE)."
+			return
+		}
+		
+		if (-not (Test-Path -Path $wbinFile -PathType Leaf)) {
+			Write-Host "[NOGX] WARNING: runner.wbin was not created by 7-Zip."
+			return
+		}
+		
+		RemoveFile-Zip -Zip $Zip -FileName "runner.wbin"
+		RemoveFile-Zip -Zip $Zip -FileName "runner.wasm.gz"
+		Write-Host "[NOGX] Adding 'runner.wbin'"
+		[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($Zip, $wbinFile, "runner.wbin") | Out-Null
+	}
+	catch {
+		Write-Host "[NOGX] WARNING: Failed to create runner.wbin in ZIP: $_"
+	}
+	finally {
+		Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+	}
+}
+
 # Main execution block
 $zip = $null
 try {
-	# Step 1: Open ZIP archive for modification
-	Write-Host "[NOGX] Repackaging target file..."
-	$zip = [System.IO.Compression.ZipFile]::Open($YYtargetFile, 'Update')
-
-	# Step 2: Remove extra files from ZIP archive
-	RemoveFile-Zip -Zip $zip -FileName "index.html"
-
-	# Step 3: Process files based on runtime target
-	if ($YYTARGET_runtime -ieq "YYC") {
-		# YYC (YoYo Compiler) runtime: remove unnecessary files and rename JS file
-		RemoveFile-Zip -Zip $zip -FileName "runner.html"
-		RemoveFile-Zip -Zip $zip -FileName "runner.json"
-		RemoveFile-Zip -Zip $zip -FileName "run.xml"
-		RemoveFile-Zip -Zip $zip -FileName "runner-sw.js"
-		RemoveFile-Zip -Zip $zip -FileName "$YYprojectName.html"
-		RenameFile-Zip -Zip $zip -OldName "$YYprojectName.js" -NewName "runner.js"
+	if($isHTML5 -and $env:YYEXTOPT_NOGX_EnableInjectionsForHTML5 -ne "True") {
+		Write-Host "[NOGX] Aborting: There's nothing to do in HTML5 target."
+		exit 0
 	}
-	elseif ($YYTARGET_runtime -ieq "VM") {
-		# VM (Virtual Machine) runtime: remove runner.json
-		RemoveFile-Zip -Zip $zip -FileName "runner.json"
-	}
-	else {
-		$zip.Dispose()
-		Write-Error "[NOGX] ERROR: Unknown runtime target '$YYTARGET_runtime'."
-		Write-Error "[NOGX] Supported runtime targets: YYC, VM"
-		exit 1
-	}
-
-	# Step 4: Fix "Ya" variable conflict if enabled
-	if ($YYEXTOPT_NOGX_YaFix -eq "True") {
-		Write-Host "[NOGX] Fixing Ya variable conflict."
-		$entryPath = "runner.js"
-		$entry = $zip.GetEntry($entryPath)
-		
-		if ($null -ne $entry) {
-			$encoding = [System.Text.Encoding]::UTF8
-			
-			# Read content from runner.js
-			$stream = $entry.Open()
-			$reader = New-Object System.IO.StreamReader($stream, $encoding)
-			$content = $reader.ReadToEnd()
-			$reader.Dispose()
-			$stream.Dispose()
-			$entry.Delete()
-			
-			# Apply replacements to fix Ya variable conflict:
-			# 1. Replace "Ya" -> "Yv" globally
-			# 2. Replace WebAssembly.instantiate(d,b) with wrapper that sets Ya=Yv
-			# 3. Replace WebAssembly.instantiateStreaming patterns with wrappers
-			$updatedContent = $content.Replace("Ya", "Yv").Replace(
-					"WebAssembly.instantiate(d,b)",
-					"{b.a.Ya=b.a.Yv;return WebAssembly.instantiate(d,b);}"
-				).Replace(
-					'(d=>WebAssembly.instantiateStreaming(d,a).then(b,function(e){l(`wasm streaming compile failed: `);l("falling back to ArrayBuffer instantiation");return Lb(c,a,b)}))',
-					'(d=>{a.a.Ya=a.a.Yv;return WebAssembly.instantiateStreaming(d,a).then(b,function(e){l(`wasm streaming compile failed: `);l("falling back to ArrayBuffer instantiation");return Lb(c,a,b)})})'
-				).Replace(
-					'(d=>WebAssembly.instantiateStreaming(d,a).then(b,function(e){l(`wasm streaming compile failed: `);l("falling back to ArrayBuffer instantiation");return Mb(c,a,b)}))',
-					'(d=>{a.a.Ya=a.a.Yv;return WebAssembly.instantiateStreaming(d,a).then(b,function(e){l(`wasm streaming compile failed: `);l("falling back to ArrayBuffer instantiation");return Mb(c,a,b)})})'
-				)
-			
-			# Write updated content to temporary file and add to ZIP
-			$tempFile = [System.IO.Path]::GetTempFileName()
-			try {
-				[System.IO.File]::WriteAllText($tempFile, $updatedContent, $encoding)
-				[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $tempFile, (Split-Path $entryPath -Leaf)) | Out-Null
-			}
-			catch {
-				Write-Error "[NOGX] ERROR: Failed to update runner.js with Ya fix: $_"
-				throw
-			}
-			finally {
-				if (Test-Path -Path $tempFile) {
-					Remove-Item -Path $tempFile -Force -ErrorAction SilentlyContinue
-				}
-			}
-		}
-		else {
-			Write-Warning "[NOGX] runner.js not found in ZIP archive. Skipping Ya fix."
-		}
-	}
-
-	# Step 5: Add files from 'webfiles' folder if it exists
-	if (Test-Path -Path $webfilesDir -PathType Container) {
-		Write-Host "[NOGX] Adding 'webfiles' folder content."
-		Push-Location -Path $webfilesDir
-		try {
-			$files = Get-ChildItem -Recurse -File -ErrorAction Stop
-			
-			foreach ($file in $files) {
-				# Calculate relative path and normalize to forward slashes
-				$relativePath = Resolve-Path -Path $file.FullName -Relative
-				$relativePath = $relativePath.Substring(2).Replace('\', '/')
-				
-				# Remove existing entry if it exists
-				$entry = $zip.GetEntry($relativePath)
-				if ($null -ne $entry) {
-					$entry.Delete()
-				}
-				
-				# Add file to ZIP archive
-				Write-Host "[NOGX] Adding '$relativePath'"
-				[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file.FullName, $relativePath) | Out-Null
-			}
-		}
-		catch {
-			Write-Error "[NOGX] ERROR: Failed to add webfiles folder content: $_"
-			throw
-		}
-		finally {
-			Pop-Location
-		}
-	}
-	else {
-		Write-Host "[NOGX] 'webfiles' folder does not exist. Skipping."
-	}
-
-	# Step 6: Add prepared 'index.html' file
+	
+	# Step 1: Show info
+	Write-Host "[NOGX] Project name: $YYprojectName"
+	Write-Host "[NOGX] Target runtime: $YYTARGET_runtime"
+	Write-Host "[NOGX] Target file: $YYtargetFile"
+	Write-Host "[NOGX] Target type: $YYtargetType"
+	
+	# Step 2: Validate that the processed index.html file exists
 	$sourceFile = [System.IO.Path]::Combine($YYtempFolder, "NOGX_index.html")
 	if (-not (Test-Path -Path $sourceFile -PathType Leaf)) {
-		$zip.Dispose()
 		Write-Error "[NOGX] ERROR: Processed index.html file does not exist: '$sourceFile'"
 		Write-Error "[NOGX] Make sure pre_build_step.ps1 completed successfully."
 		exit 1
 	}
 	
-	# Remove existing index.html and add the processed one
-	RemoveFile-Zip -Zip $zip -FileName "index.html"
-	Write-Host "[NOGX] Add processed 'index.html'"
-	[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $sourceFile, "index.html") | Out-Null
+	if($isHTML5) {
+		# Step 3: Override index.html
+		if($YYtargetType -ieq "folder") {
+			if (-not (Test-Path -Path $YYtargetFile -PathType Container)) {
+				Write-Error "[NOGX] ERROR: Target file not found: '$YYtargetFile'"
+				exit 1
+			}
+			
+			$indexFile = [System.IO.Path]::Combine($YYtargetFile, $env:YYPLATFORM_option_html5_outputname)
+			Write-Host "[NOGX] Overriding '$indexFile' by '$sourceFile'"
+			Copy-Item -Path $sourceFile -Destination $indexFile -Force -ErrorAction Stop
+			
+			Compress-NOGXRunnerWasm -TargetDir $YYtargetFile
+			
+			Write-Host "[NOGX] Done!"
+			exit 0
+		}
+		elseif ($YYtargetType -ieq "zip") {
+			if (-not (Test-Path -Path $YYtargetFile -PathType Leaf)) {
+				Write-Error "[NOGX] ERROR: Target file not found: '$YYtargetFile'"
+				exit 1
+			}
+			
+			Write-Host "[NOGX] Repackaging target file..."
+			$zip = [System.IO.Compression.ZipFile]::Open($YYtargetFile, 'Update')
+			
+			RemoveFile-Zip -Zip $zip -FileName $env:YYPLATFORM_option_html5_outputname
+			
+			$indexFile = $env:YYPLATFORM_option_html5_outputname
+			Write-Host "[NOGX] Adding new '$indexFile' from '$sourceFile'"
+			[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $sourceFile, $env:YYPLATFORM_option_html5_outputname) | Out-Null
+			
+			Compress-NOGXRunnerWasmInZip -Zip $zip
+			
+			$zip.Dispose()
+			Write-Host "[NOGX] Repackaging complete!"
+			exit 0
+		}
+		else {
+			Write-Error "[NOGX] Unknown target type '$YYtargetType'."
+			exit 1
+		}
+	}
+	elseif($isOperaGxPlatform) {
+		if (-not (Test-Path -Path $YYtargetFile -PathType Leaf)) {
+			Write-Error "[NOGX] ERROR: Target file not found: '$YYtargetFile'"
+			exit 1
+		}
+		
+		$webfilesDir = [System.IO.Path]::Combine($PSScriptRoot, "..", "..", "webfiles")
+		$webfilesDir = [System.IO.Path]::GetFullPath($webfilesDir)
+		Write-Host "[NOGX] Webfiles dir: $webfilesDir"
+		
+		# Step 3: Open ZIP archive for modification
+		Write-Host "[NOGX] Repackaging target file..."
+		$zip = [System.IO.Compression.ZipFile]::Open($YYtargetFile, 'Update')
+		
+		# Step 4: Remove extra files from ZIP archive
+		RemoveFile-Zip -Zip $zip -FileName "index.html"
+		
+		# Step 5: Process files based on runtime target
+		if ($YYTARGET_runtime -ieq "YYC") {
+			# YYC (YoYo Compiler) runtime: remove unnecessary files and rename JS file
+			RemoveFile-Zip -Zip $zip -FileName "runner.html"
+			RemoveFile-Zip -Zip $zip -FileName "runner.json"
+			RemoveFile-Zip -Zip $zip -FileName "run.xml"
+			RemoveFile-Zip -Zip $zip -FileName "runner-sw.js"
+			RemoveFile-Zip -Zip $zip -FileName "$YYprojectName.html"
+			RenameFile-Zip -Zip $zip -OldName "$YYprojectName.js" -NewName "runner.js"
+		}
+		elseif ($YYTARGET_runtime -ieq "VM") {
+			# VM (Virtual Machine) runtime: remove runner.json
+			RemoveFile-Zip -Zip $zip -FileName "runner.json"
+		}
+		else {
+			$zip.Dispose()
+			Write-Error "[NOGX] ERROR: Unknown runtime target '$YYTARGET_runtime'."
+			Write-Error "[NOGX] Supported runtime targets: YYC, VM"
+			exit 1
+		}
+		
+		# Step 6: Patch runner.js
+		if ($YYEXTOPT_NOGX_YaFix -eq "True" -or $YYEXTOPT_NOGX_ReplaceAlertOnError -eq "True") {
+			Write-Host "[NOGX] Patching 'runner.js'"
+			$entryPath = "runner.js"
+			$entry = $zip.GetEntry($entryPath)
+			
+			if ($null -ne $entry) {
+				$encoding = [System.Text.Encoding]::UTF8
+				
+				# Read content from runner.js
+				$stream = $entry.Open()
+				$reader = New-Object System.IO.StreamReader($stream, $encoding)
+				$content = $reader.ReadToEnd()
+				$reader.Dispose()
+				$stream.Dispose()
+				$entry.Delete()
+				
+				$updatedContent = $content
+				
+				# Fix "Ya" variable conflict if enabled
+				if ($YYEXTOPT_NOGX_YaFix -eq "True") {
+					Write-Host "[NOGX] Apply 'YaFix'"
+					# Apply replacements to fix Ya variable conflict:
+					# 1. Replace "Ya" -> "Yv" globally
+					# 2. Replace WebAssembly.instantiate(d,b) with wrapper that sets Ya=Yv
+					# 3. Replace WebAssembly.instantiateStreaming patterns with wrappers
+					
+					$updatedContent = $updatedContent -creplace '(?<![a-zA-Z0-9_])Ya(?![a-zA-Z0-9_])', 'Yv'
+					
+					$updatedContent = $updatedContent.Replace(
+							'WebAssembly.instantiate(d,b)',
+							'WebAssembly.instantiate(d,(b.a.Ya=b.a.Yv,b))'
+						)
+					$updatedContent = $updatedContent.Replace(
+							'WebAssembly.instantiateStreaming(d,a)',
+							'WebAssembly.instantiateStreaming(d,(a.a.Ya=a.a.Yv,a))'
+						)
+				}
+				
+				# Replace "alert" -> "console.error" in window.onerror
+				if ($YYEXTOPT_NOGX_ReplaceAlertOnError -eq "True") {
+					Write-Host "[NOGX] Apply 'ReplaceAlertOnError'"
+					
+					$updatedContent = $updatedContent.Replace(
+							'alert("Error occured: "+a)',
+							'console.error("Error occured: "+a)'
+						)
+				}
 
-	# Step 7: Close and save ZIP archive
-	$zip.Dispose()
-
-	Write-Host "[NOGX] Repackaging complete!"
-	exit 0
+				# Removing the "Downloading data..."
+				$updatedContent = $updatedContent.Replace(
+					'k.setStatus&&k.setStatus(`Downloading data... (${B}/${r})`)',
+					'0'
+				)
+				$updatedContent = $updatedContent.Replace(
+					'k.setStatus&&k.setStatus("Downloading data...")',
+					'0'
+				)
+				
+				# Write updated content to temporary file and add to ZIP
+				$tempFile = [System.IO.Path]::GetTempFileName()
+				try {
+					[System.IO.File]::WriteAllText($tempFile, $updatedContent, $encoding)
+					[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $tempFile, (Split-Path $entryPath -Leaf)) | Out-Null
+				}
+				catch {
+					Write-Error "[NOGX] ERROR: Failed to patch runner.js: $_"
+					throw
+				}
+				finally {
+					if (Test-Path -Path $tempFile) {
+						Remove-Item -Path $tempFile -Force -ErrorAction SilentlyContinue
+					}
+				}
+				
+				Write-Host "[NOGX] runner.js patching complete!"
+			}
+			else {
+				Write-Warning "[NOGX] runner.js not found in ZIP archive."
+			}
+		}
+		
+		# Step 7: Add Included Files (All / GX.games) under HTML5 Folder name
+		. (Join-Path $PSScriptRoot "nogx_datafiles.ps1")
+		Add-NOGXDatafilesToZip -Zip $zip
+		
+		# Step 8: Add files from 'webfiles' folder if it exists (overrides conflicts)
+		if (Test-Path -Path $webfilesDir -PathType Container) {
+			Write-Host "[NOGX] Adding 'webfiles' folder content."
+			Push-Location -Path $webfilesDir
+			try {
+				$files = Get-ChildItem -Recurse -File -ErrorAction Stop
+				
+				foreach ($file in $files) {
+					# Calculate relative path and normalize to forward slashes
+					$relativePath = Resolve-Path -Path $file.FullName -Relative
+					$relativePath = $relativePath.Substring(2).Replace('\', '/')
+					
+					# Remove existing entry if it exists
+					$entry = $zip.GetEntry($relativePath)
+					if ($null -ne $entry) {
+						$entry.Delete()
+					}
+					
+					# Add file to ZIP archive
+					Write-Host "[NOGX] Adding '$relativePath'"
+					[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file.FullName, $relativePath) | Out-Null
+				}
+			}
+			catch {
+				Write-Error "[NOGX] ERROR: Failed to add webfiles folder content: $_"
+				throw
+			}
+			finally {
+				Pop-Location
+			}
+		}
+		else {
+			Write-Host "[NOGX] 'webfiles' folder does not exist. Skipping."
+		}
+		
+		# Remove existing index.html and add the processed one
+		RemoveFile-Zip -Zip $zip -FileName "index.html"
+		Write-Host "[NOGX] Add processed 'index.html'"
+		[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $sourceFile, "index.html") | Out-Null
+		
+		Compress-NOGXRunnerWasmInZip -Zip $zip
+		
+		# Step 9: Close and save ZIP archive
+		$zip.Dispose()
+		
+		Write-Host "[NOGX] Repackaging complete!"
+		exit 0
+	}
 }
 catch {
 	# Ensure ZIP archive is disposed even on error

@@ -5,15 +5,39 @@
     "f605eed0-730c-4c7c-97ff-756796b75a23": null,
     "a9ba5dbf-b0fa-4ba1-adad-c74e23460d27": {
       "Default": {
-        "value": "False"
+        "value": "True"
       }
     },
     "ba7bcfc3-fd11-48f0-9039-b2a1b9fe559d": null,
     "e7dc1f70-0efc-46ad-a73f-dc6a33bad046": null,
-    "cdd374b8-4004-4586-89ca-e113af8d80f2": null,
-    "3e486fcd-9ca6-436b-a627-c444151aba3d": null,
+    "cdd374b8-4004-4586-89ca-e113af8d80f2": {
+      "Default": {
+        "value": "3:4"
+      }
+    },
+    "3e486fcd-9ca6-436b-a627-c444151aba3d": {
+      "Default": {
+        "value": "4:3"
+      }
+    },
     "9e888c2b-c03d-4522-b54e-9fc527a55e26": null,
     "631dab0b-3ddb-45bf-a195-0400c6ccb092": null,
-    "aa6d5212-b0cc-4d64-9b1f-ca0a33080484": null
+    "aa6d5212-b0cc-4d64-9b1f-ca0a33080484": null,
+    "99226052-fddb-44f3-8a90-99fa831ff7e4": null,
+    "6b338481-49be-4e15-9ff3-835ce098ab8d": null,
+    "8a20a7e7-b353-4785-94fe-084e8c78fa3d": null,
+    "fc5f19d9-1981-49f9-9ae1-89d361e98213": {
+      "Default": {
+        "value": "True"
+      }
+    },
+    "11809f66-d385-4b11-a451-0d41de5e9e4b": null,
+    "8fc683ce-df5c-4cb5-84a4-889d35e91a05": null,
+    "fa36426d-1d84-4d84-a20e-a586a50692d0": {
+      "Default": {
+        "value": "True"
+      }
+    },
+    "b4e8c1d2-3f5a-4b6c-9d0e-1a2b3c4d5e6f": null
   }
 }

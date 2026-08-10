@@ -11,9 +11,10 @@ if (not isMap(async_load)) {
 			
             case YaGames_CallPaymentsInit:
                 // Payments initialization success
-				with (obj_childrenPayments_parent) {
-					is_disabled = false;	
-				}
+				// Payments are initialized automatically at the first request.
+				//with (obj_childrenPayments_parent) {
+				//	is_disabled = false;	
+				//}
 				is_disabled = true;
             break;
             case YaGames_CallPaymentsInitError:

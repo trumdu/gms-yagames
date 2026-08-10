@@ -48,7 +48,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.14.2.213",
+    "IDEVersion":"2024.14.4.222",
   },
   "name":"YandexGames_Demo",
   "resources":[
@@ -62,6 +62,7 @@
     {"id":{"name":"obj_button_banner_showAdv","path":"objects/obj_button_banner_showAdv/obj_button_banner_showAdv.yy",},},
     {"id":{"name":"obj_button_browserConsoleLog","path":"objects/obj_button_browserConsoleLog/obj_button_browserConsoleLog.yy",},},
     {"id":{"name":"obj_button_EventDispatch","path":"objects/obj_button_EventDispatch/obj_button_EventDispatch.yy",},},
+    {"id":{"name":"obj_button_EventOff","path":"objects/obj_button_EventOff/obj_button_EventOff.yy",},},
     {"id":{"name":"obj_button_EventOn","path":"objects/obj_button_EventOn/obj_button_EventOn.yy",},},
     {"id":{"name":"obj_button_exutFullscreen","path":"objects/obj_button_exutFullscreen/obj_button_exutFullscreen.yy",},},
     {"id":{"name":"obj_button_GameAPIGetAllGames","path":"objects/obj_button_GameAPIGetAllGames/obj_button_GameAPIGetAllGames.yy",},},
@@ -102,6 +103,7 @@
     {"id":{"name":"obj_button_getServerTime","path":"objects/obj_button_getServerTime/obj_button_getServerTime.yy",},},
     {"id":{"name":"obj_button_initPayments","path":"objects/obj_button_initPayments/obj_button_initPayments.yy",},},
     {"id":{"name":"obj_button_initPlayer","path":"objects/obj_button_initPlayer/obj_button_initPlayer.yy",},},
+    {"id":{"name":"obj_button_IsAvailableMethod","path":"objects/obj_button_IsAvailableMethod/obj_button_IsAvailableMethod.yy",},},
     {"id":{"name":"obj_button_isInit","path":"objects/obj_button_isInit/obj_button_isInit.yy",},},
     {"id":{"name":"obj_button_log_clear","path":"objects/obj_button_log_clear/obj_button_log_clear.yy",},},
     {"id":{"name":"obj_button_MultiplayerEventBased","path":"objects/obj_button_MultiplayerEventBased/obj_button_MultiplayerEventBased.yy",},},
@@ -123,6 +125,7 @@
     {"id":{"name":"obj_button_shortcut_ShowPrompt","path":"objects/obj_button_shortcut_ShowPrompt/obj_button_shortcut_ShowPrompt.yy",},},
     {"id":{"name":"obj_button_showFullscreenAds","path":"objects/obj_button_showFullscreenAds/obj_button_showFullscreenAds.yy",},},
     {"id":{"name":"obj_button_showRewardVideo","path":"objects/obj_button_showRewardVideo/obj_button_showRewardVideo.yy",},},
+    {"id":{"name":"obj_button_StorageDemo","path":"objects/obj_button_StorageDemo/obj_button_StorageDemo.yy",},},
     {"id":{"name":"obj_childrenPayments_parent","path":"objects/obj_childrenPayments_parent/obj_childrenPayments_parent.yy",},},
     {"id":{"name":"obj_childrenPlayer_parent","path":"objects/obj_childrenPlayer_parent/obj_childrenPlayer_parent.yy",},},
     {"id":{"name":"obj_game_init","path":"objects/obj_game_init/obj_game_init.yy",},},

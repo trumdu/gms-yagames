@@ -2,8 +2,9 @@
 if (not isMap(async_load)) {
     log("async_load got lost in cyberspace");
 } else {
-	// The "game_api_pause" and "game_api_resume" notifications 
-	// always arrive with a request_id of 42 (YaGames_RequestIdGameApi)
+	// The "game_api_pause" and "game_api_resume" notifications
+	// always arrive with a request_id of 42 (YaGames_RequestIdGameApi).
+	// Account selection dialog events use the same request_id.
     if ((async_load[? "type"]== YaGames_AsyncEvent) and (async_load[? "request_id"] == YaGames_RequestIdGameApi)) {
 		// 
 		var _msg = "";
@@ -17,6 +18,18 @@ if (not isMap(async_load)) {
 			
             case YaGames_CallGameApiResume:
 					text = text_base + "Resume";
+			        _msg = json_encode(async_load);
+			        log(_msg);
+            break;
+
+            case YaGames_CallAccountSelectionDialogOpened:
+					text = text_base + "AccOpen";
+			        _msg = json_encode(async_load);
+			        log(_msg);
+            break;
+
+            case YaGames_CallAccountSelectionDialogClosed:
+					text = text_base + "AccClose";
 			        _msg = json_encode(async_load);
 			        log(_msg);
             break;

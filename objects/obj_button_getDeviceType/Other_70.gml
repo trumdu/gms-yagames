@@ -12,25 +12,27 @@ if (not isMap(async_load)) {
 			case YaGames_CallDeviceType:
 				// Device Type
                 var _value = async_load[? "value"];
+				var _dev_type = "";
 				switch (_value) {
 					case YaGames_DeviceDesktop:
-						dev_type = "Desktop";
+						_dev_type = "Desktop";
 						break;
 					case YaGames_DeviceTablet:
-						dev_type = "Tablet";
+						_dev_type = "Tablet";
 						break;
 					case YaGames_DeviceMobile:
-						dev_type = "Mobile";
+						_dev_type = "Mobile";
 						break;
 					case YaGames_DeviceTV:
-						dev_type = "TV";
+						_dev_type = "TV";
 						break;
 					case YaGames_DeviceUndefined:
-						dev_type = "Undefined";
+						_dev_type = "Undefined";
 						break;
 					default:
-						dev_type = "ERROR " + string(_value);
+						_dev_type = "ERROR " + string(_value);
 				}
+				show_message_async(_dev_type);
 			break;
 			
             case YaGames_CallNotInitSDK:

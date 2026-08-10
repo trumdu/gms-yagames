@@ -19,6 +19,11 @@ if (not isMap(async_load)) {
 				// _data.data.secondDomain;
 				// _data.isTelegram;
 				log("App ID: " + _app_id);
+				if (variable_struct_exists(_data, "referrer") && is_struct(_data.referrer)) {
+					log("Promo referrer: " + json_stringify(_data.referrer));
+				} else {
+					log("Promo referrer: none");
+				}
             break;
 			
             case YaGames_CallNotInitSDK:

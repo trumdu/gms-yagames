@@ -10,18 +10,18 @@ if (not isMap(async_load)) {
         switch (async_load[? "event"]) {	
 			
             case YaGames_CallGetCatalog:
-                // Get Purchases success
+                // Get Catalog success
 				var _data = json_parse(async_load[? "data"]);
-				array_foreach(_data, function(_product)
-				{
-					log("Product: " + _product.title);
-					//_product.id
-					//_product.description
-					//_product.imageURI
-					//_product.price
-					//_product.priceValue
-					//_product.priceCurrencyCode
-				});
+				if (is_array(_data)) {
+					array_foreach(_data, function(_product)
+					{
+						log("Product: " + _product.title);
+						//_product.id
+						//_product.description
+						//_product.imageURI
+						//_product.priceValue
+					});
+				}
             break;
             case YaGames_CallGetCatalogError:
                 var errCode = async_load[? "code"];

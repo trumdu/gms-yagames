@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 
 # Get environment variables from GameMaker Studio
 $YYMACROS_project_full_filename = $env:YYMACROS_project_full_filename
+$YYruntimeLocation = $env:YYruntimeLocation
 $YYtempFolder = $env:YYtempFolder
 $YYoutputFolder = $env:YYoutputFolder
 $YYPLATFORM_name = $env:YYPLATFORM_name
@@ -17,10 +18,11 @@ if ($YYEXTOPT_NOGX_Enable -ne "True") {
 
 Write-Host "[NOGX] Current platform: $YYPLATFORM_name"
 
-# Check if the current platform is Opera GX
+# Check if the current platform is Opera GX or HTML5
 $isOperaGxPlatform = $YYPLATFORM_name -ieq "Opera GX" -or $YYPLATFORM_name -ieq "operagx"
-if (-not $isOperaGxPlatform) {
-	Write-Host "[NOGX] Aborting: This script is only for Opera GX platform."
+$isHTML5 = $YYPLATFORM_name -ieq "html5"
+if (-not ($isOperaGxPlatform -or $isHTML5)) {
+	Write-Host "[NOGX] Aborting: This script is only for Opera GX and HTML5 platform."
 	exit 0
 }
 
@@ -164,20 +166,23 @@ function Get-HTML5CodeInjectionFromGMExt {
 			return ""
 		}
 		
-		# Check if the extension is configured for Opera GX platform (bit 34)
-		$gxPlatformMask = 1L -shl 34
+		# Check if the extension is configured
+		$platformMask = 1L -shl 34 # for Opera GX platform (bit 34)
+		if($isHTML5) {
+			$platformMask = 1L -shl 5 # for HTML5 (bit 5)
+		}
 		
 		if ($null -eq $jsonStruct.copyToTargets) {
 			return ""
 		}
 		
-		# Check if the GX flag is set and HTML5 properties exist
+		# Check if the flag is set and HTML5 properties exist
 		$copyToTargetsFlags = [Int64]$jsonStruct.copyToTargets
-		$hasGxFlag = ($copyToTargetsFlags -band $gxPlatformMask) -ne 0
+		$hasFlag = ($copyToTargetsFlags -band $platformMask) -ne 0
 		$hasHtml5Props = $null -ne $jsonStruct.html5Props
 		
 		# Return HTML5 code injection if conditions are met
-		if ($hasHtml5Props -and $hasGxFlag) {
+		if ($hasHtml5Props -and $hasFlag) {
 			if ($null -ne $jsonStruct.HTML5CodeInjection) {
 				return $jsonStruct.HTML5CodeInjection
 			}
@@ -214,6 +219,10 @@ function Accumulate-AllHTML5CodeInjections {
 		
 		# Initialize variables for substitution
 		$GM_HTML5_BrowserTitle = $env:YYPLATFORM_option_operagx_game_name
+		if($isHTML5) {
+			$GM_HTML5_BrowserTitle = $env:YYPLATFORM_option_html5_browser_title
+		}
+		
 		if ([string]::IsNullOrWhiteSpace($GM_HTML5_BrowserTitle)) {
 			$GM_HTML5_BrowserTitle = "Game"
 		}
@@ -221,9 +230,20 @@ function Accumulate-AllHTML5CodeInjections {
 		$GM_HTML5_BackgroundColour = "#000000"
 		$GM_HTML5_GameWidth = "640"
 		$GM_HTML5_GameHeight = "360"
-		$GM_HTML5_GameFolder = ""
-		$GM_HTML5_GameFilename = ""
+		$GM_HTML5_GameFolder = $env:YYPLATFORM_option_html5_foldername
+		$GM_HTML5_GameFilename = "$env:YYprojectName.js"
 		$GM_HTML5_CacheBust = "$(Get-Random)"
+		$GM_HTML5_InjectCenterStyle = ""
+		
+		if($env:YYPLATFORM_option_html5_centregame -ieq "True") {
+			$GM_HTML5_InjectCenterStyle = 'style="position: absolute; top: 50%; left: 50%; bottom: -50%; right: -50%; transform: translate(-50%, -50%);"'
+		}
+		
+		$GM_HTML5_InjectDisableCache = ""
+		$GM_HTML5_InjectFlurryAnalytics = ""
+		$GM_HTML5_InjectSplashScreen = ""
+		$GM_HTML5_InjectRunnerPath = ""
+		$GM_HTML5_InjectGoogleAnalytics = ""
 		
 		# Replace standard variables in injections
 		$allInjectors = $allInjectors.Replace("`${GM_HTML5_BrowserTitle}", $GM_HTML5_BrowserTitle)
@@ -233,6 +253,12 @@ function Accumulate-AllHTML5CodeInjections {
 		$allInjectors = $allInjectors.Replace("`${GM_HTML5_GameFolder}", $GM_HTML5_GameFolder)
 		$allInjectors = $allInjectors.Replace("`${GM_HTML5_GameFilename}", $GM_HTML5_GameFilename)
 		$allInjectors = $allInjectors.Replace("`${GM_HTML5_CacheBust}", $GM_HTML5_CacheBust)
+		$allInjectors = $allInjectors.Replace("`${GM_HTML5_InjectCenterStyle}", $GM_HTML5_InjectCenterStyle)
+		$allInjectors = $allInjectors.Replace("`${GM_HTML5_InjectDisableCache}", $GM_HTML5_InjectDisableCache)
+		$allInjectors = $allInjectors.Replace("`${GM_HTML5_InjectFlurryAnalytics}", $GM_HTML5_InjectFlurryAnalytics)
+		$allInjectors = $allInjectors.Replace("`${GM_HTML5_InjectSplashScreen}", $GM_HTML5_InjectSplashScreen)
+		$allInjectors = $allInjectors.Replace("`${GM_HTML5_InjectRunnerPath}", $GM_HTML5_InjectRunnerPath)
+		$allInjectors = $allInjectors.Replace("`${GM_HTML5_InjectGoogleAnalytics}", $GM_HTML5_InjectGoogleAnalytics)
 		
 		# Replace extension option environment variables (YYEXTOPT_*)
 		$extensionOptions = (Get-ChildItem Env: | Where-Object Name -like 'YYEXTOPT_*').Name
@@ -302,6 +328,12 @@ function Accumulate-AllHTML5CodeInjections {
 		$groups["GM_HTML5_GameFolder"] = $GM_HTML5_GameFolder
 		$groups["GM_HTML5_GameFilename"] = $GM_HTML5_GameFilename
 		$groups["GM_HTML5_CacheBust"] = $GM_HTML5_CacheBust
+		$groups["GM_HTML5_InjectCenterStyle"] = $GM_HTML5_InjectCenterStyle
+		$groups["GM_HTML5_InjectDisableCache"] = $GM_HTML5_InjectDisableCache
+		$groups["GM_HTML5_InjectFlurryAnalytics"] = $GM_HTML5_InjectFlurryAnalytics
+		$groups["GM_HTML5_InjectSplashScreen"] = $GM_HTML5_InjectSplashScreen
+		$groups["GM_HTML5_InjectRunnerPath"] = $GM_HTML5_InjectRunnerPath
+		$groups["GM_HTML5_InjectGoogleAnalytics"] = $GM_HTML5_InjectGoogleAnalytics
 		
 		return $groups
 	}
@@ -362,6 +394,20 @@ function Inject-TextFile {
 				$content = $content.Replace("`${$key}", $value)
 			}
 		}
+
+		# Replace extension option placeholders used directly by index.html.
+		$extensionOptions = (Get-ChildItem Env: | Where-Object Name -like 'YYEXTOPT_*').Name
+		foreach ($optionName in $extensionOptions) {
+			try {
+				$optionValue = (Get-Item "env:$optionName").Value
+				if ($null -ne $optionValue) {
+					$content = $content.Replace("`${$optionName}", $optionValue)
+				}
+			}
+			catch {
+				Write-Warning "[NOGX] Failed to inject extension option '$optionName': $_"
+			}
+		}
 		
 		# Write the processed content to output file
 		$content | Out-File -FilePath $outputFilename -Encoding utf8 -ErrorAction Stop
@@ -372,8 +418,40 @@ function Inject-TextFile {
 	}
 }
 
+<#
+.SYNOPSIS
+    Includes or removes wasm compression loader scripts based on EnableCodeCompression.
+#>
+function Apply-NOGXCodeCompressionScripts {
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory)]
+		[string]$Content
+	)
+	
+	$blockPattern = '(?s)\t<!-- NOGX_CODE_COMPRESSION_START -->.*?<!-- NOGX_CODE_COMPRESSION_END -->\r?\n?'
+	
+	if ($env:YYEXTOPT_NOGX_EnableCodeCompression -eq "True") {
+		if ($Content -notmatch '<!-- NOGX_CODE_COMPRESSION_START -->') {
+			return $Content
+		}
+		
+		return $Content `
+			-replace '\r?\n\t<!-- NOGX_CODE_COMPRESSION_START -->\r?\n', "`r`n" `
+			-replace '\r?\n\t<!-- NOGX_CODE_COMPRESSION_END -->', ''
+	}
+	
+	Write-Host "[NOGX] Code compression disabled. Removing wasm loader from index.html."
+	return $Content -replace $blockPattern, ''
+}
+
 # Main execution block
 try {
+	if($isHTML5 -and $env:YYEXTOPT_NOGX_EnableInjectionsForHTML5 -ne "True") {
+		Write-Host "[NOGX] Aborting: There's nothing to do in HTML5 target."
+		exit 0
+	}
+	
 	# Step 1: Get list of extension filenames from project file
 	Write-Host "[NOGX] Getting all extension filenames from '$YYMACROS_project_full_filename'"
 	$extensionFilenames = Get-AllGMExtensionFilenames -projectFullFilename $YYMACROS_project_full_filename
@@ -398,19 +476,33 @@ try {
 	}
 
 	# Step 3: Determine source index.html file (custom or default)
-	$webfilesDir = [System.IO.Path]::Combine($PSScriptRoot, "..", "..", "webfiles")
-	$customIndexFile = [System.IO.Path]::GetFullPath(
-		[System.IO.Path]::Combine($webfilesDir, "index.html")
-	)
-	$defaultIndexFile = [System.IO.Path]::Combine($PSScriptRoot, "index.html")
-
-	$sourceFile = $defaultIndexFile
-	if (Test-Path $customIndexFile -PathType Leaf) {
-		$sourceFile = $customIndexFile
-		Write-Host "[NOGX] Using custom index.html from webfiles directory"
+	$sourceFile = ""
+	
+	if ($isHTML5) {
+		if($env:YYPLATFORM_option_html5_index -ne 'use_default') {
+			$subpath = $env:YYPLATFORM_option_html5_index.Replace("datafiles/", "")
+			$sourceFile = [System.IO.Path]::Combine($env:YYprojectDir, "datafiles", $subpath)
+			Write-Host "[NOGX] Using custom index.html from datafiles directory ('$subpath')"
+		}
+		else {
+			$sourceFile = [System.IO.Path]::Combine($YYruntimeLocation, "html5", "index.html")
+			Write-Host "[NOGX] Using default index.html from HTML5 runtime"
+		}
 	}
-	else {
-		Write-Host "[NOGX] Using default index.html from extension directory"
+	elseif ($isOperaGxPlatform) {
+		$webfilesDir = [System.IO.Path]::Combine($PSScriptRoot, "..", "..", "webfiles")
+		$customIndexFile = [System.IO.Path]::GetFullPath(
+			[System.IO.Path]::Combine($webfilesDir, "index.html")
+		)
+		
+		if (Test-Path $customIndexFile -PathType Leaf) {
+			$sourceFile = $customIndexFile
+			Write-Host "[NOGX] Using custom index.html from webfiles directory"
+		}
+		else {
+			$sourceFile = [System.IO.Path]::Combine($PSScriptRoot, "index.html")
+			Write-Host "[NOGX] Using default index.html from extension directory"
+		}
 	}
 
 	# Validate that source file exists
@@ -424,6 +516,10 @@ try {
 	Write-Host "[NOGX] Injecting into 'index.html' ('$sourceFile' -> '$outputFilename')"
 	
 	Inject-TextFile -inputFilename $sourceFile -outputFilename $outputFilename -injections $injections
+	
+	$content = Get-Content -Raw -Path $outputFilename -Encoding utf8 -ErrorAction Stop
+	$content = Apply-NOGXCodeCompressionScripts -Content $content
+	$content | Out-File -FilePath $outputFilename -Encoding utf8 -ErrorAction Stop
 
 	Write-Host "[NOGX] The injection is complete. The resulting file is in '$outputFilename'"
 	exit 0

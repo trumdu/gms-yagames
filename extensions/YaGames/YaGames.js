@@ -18,6 +18,8 @@ var YaGamesGMS = {
 	_lb: null,
 	_player: null,
 	_payments: null,
+	_safeStorage: null,
+	_eventHandlers: {},
 
 	parseJson: function (json) {
 		try {
@@ -195,6 +197,38 @@ var YaGamesGMS = {
 	getPaymentsInitStatus: function () {
 		return YaGamesGMS._payments !== null;
 	},
+	/**
+	 * Prefer explicit getPayments() init; otherwise use ysdk.payments directly.
+	 * @returns {boolean}
+	 */
+	ensurePayments: function () {
+		let self = YaGamesGMS;
+		if (self._payments !== null) {
+			return true;
+		}
+		if (self._ysdk && self._ysdk.payments) {
+			self._payments = self._ysdk.payments;
+			return true;
+		}
+		return false;
+	},
+	/**
+	 * Resolve SafeStorage once and cache it.
+	 * @param {function} onOk
+	 * @param {function} onErr
+	 */
+	ensureStorage: function (onOk, onErr) {
+		let self = YaGamesGMS;
+		if (self._safeStorage) {
+			onOk(self._safeStorage);
+			return;
+		}
+		self._ysdk.getStorage().then((storage) => {
+			self._safeStorage = storage;
+			onOk(storage);
+		})
+		.catch(onErr);
+	},
 }
 
 /***
@@ -210,7 +244,11 @@ function YaGamesGML_MobileVibro(ms = 200) {
  */
 function YaGamesGMS_SdkInit() {
 	let self = YaGamesGMS;
-	YaGames.init().then(ysdk => {
+	let initOpts = undefined;
+	if (typeof YaGames_init_signed === 'boolean' && YaGames_init_signed === true) {
+		initOpts = { signed: true };
+	}
+	YaGames.init(initOpts).then(ysdk => {
 		console.log('Yandex SDK initialized');
 		self._ysdk = ysdk;
 		// We show the SDK that the game has loaded and you can start playing.
@@ -236,6 +274,21 @@ function YaGamesGMS_SdkInit() {
 			self.browserConsoleLog("Multiplayer Sessions Finish", self._game_api_request_id, opponentId);
 			self.send(self._game_api_request_id, "multiplayerSessionsFinish", opponentId);
 		});
+		// Account selection dialog (progress choice after auth)
+		if (self._ysdk.EVENTS) {
+			if (self._ysdk.EVENTS.ACCOUNT_SELECTION_DIALOG_OPENED) {
+				self._ysdk.on(self._ysdk.EVENTS.ACCOUNT_SELECTION_DIALOG_OPENED, () => {
+					self.browserConsoleLog("Account Selection Dialog Opened", self._game_api_request_id);
+					self.send(self._game_api_request_id, "accountSelectionDialogOpened");
+				});
+			}
+			if (self._ysdk.EVENTS.ACCOUNT_SELECTION_DIALOG_CLOSED) {
+				self._ysdk.on(self._ysdk.EVENTS.ACCOUNT_SELECTION_DIALOG_CLOSED, () => {
+					self.browserConsoleLog("Account Selection Dialog Closed", self._game_api_request_id);
+					self.send(self._game_api_request_id, "accountSelectionDialogClosed");
+				});
+			}
+		}
 		// Sending pause events when the game is focused
 		document.addEventListener("visibilitychange", function () {
 			if (document.hidden) {
@@ -665,6 +718,58 @@ function YaGamesGML_DeviceInfo_getType() {
 }
 
 /**
+ * @returns {Number} 1 if mobile, otherwise 0
+ */
+function YaGamesGML_DeviceInfo_IsMobile() {
+	let self = YaGamesGMS;
+	if (!self.getInitStatus()) return 0;
+	try {
+		return self._ysdk.deviceInfo.isMobile() ? 1 : 0;
+	} catch (err) {
+		return 0;
+	}
+}
+
+/**
+ * @returns {Number} 1 if desktop, otherwise 0
+ */
+function YaGamesGML_DeviceInfo_IsDesktop() {
+	let self = YaGamesGMS;
+	if (!self.getInitStatus()) return 0;
+	try {
+		return self._ysdk.deviceInfo.isDesktop() ? 1 : 0;
+	} catch (err) {
+		return 0;
+	}
+}
+
+/**
+ * @returns {Number} 1 if tablet, otherwise 0
+ */
+function YaGamesGML_DeviceInfo_IsTablet() {
+	let self = YaGamesGMS;
+	if (!self.getInitStatus()) return 0;
+	try {
+		return self._ysdk.deviceInfo.isTablet() ? 1 : 0;
+	} catch (err) {
+		return 0;
+	}
+}
+
+/**
+ * @returns {Number} 1 if TV, otherwise 0
+ */
+function YaGamesGML_DeviceInfo_IsTV() {
+	let self = YaGamesGMS;
+	if (!self.getInitStatus()) return 0;
+	try {
+		return self._ysdk.deviceInfo.isTV() ? 1 : 0;
+	} catch (err) {
+		return 0;
+	}
+}
+
+/**
  * Yandex.Game Environment
  * @returns {Number} Request ID
  */
@@ -688,6 +793,18 @@ function YaGamesGML_getEnvironment() {
 				};
 				if ('payload' in _env) {
 					envDt.payload = _env.payload;
+				}
+				if ('referrer' in _env && _env.referrer) {
+					envDt.referrer = {
+						type: _env.referrer.type,
+						promoId: _env.referrer.promoId
+					};
+					if ('intent' in _env.referrer) {
+						envDt.referrer.intent = _env.referrer.intent;
+					}
+					if ('inappId' in _env.referrer) {
+						envDt.referrer.inappId = _env.referrer.inappId;
+					}
 				}
 				try {
 					if ('browser' in _env && 'lang' in _env.browser) {
@@ -967,8 +1084,8 @@ function YaGamesGML_Leaderboards_setScore(leaderboard_name, score, extra_data) {
 
 /**
  * Player object Initialization
- * @param scopes Include name and avatar. The user will see a dialog box asking for access. If the user refuses to grant access, you will only receive their ID.
- * @param signature Include signature for external authorization. (https://yandex.ru/dev/games/doc/ru/sdk/sdk-purchases#signature)
+ * @param scopes {number} Deprecated. Access dialog is no longer shown; kept for compatibility.
+ * @param signature {number} Include signature for external authorization. (https://yandex.ru/dev/games/doc/ru/sdk/sdk-purchases#signature)
  * @returns {Number} Request ID
  */
 function YaGamesGML_Player_Init(scopes = 0, signature = 0) {
@@ -1732,7 +1849,7 @@ function YaGamesGML_Payments_Init(signed = 1) {
 }
 
 /**
- * Payments object Initialization
+ * Activate a purchase
  * @param cid {string} Product ID.
  * @param developerPayload {?string} Additional information about the purchase that you want to transfer to your server.
  * @returns {Number} Request ID
@@ -1746,7 +1863,7 @@ function YaGamesGMS_Payments_Purchase(cid, developerPayload = null) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getPaymentsInitStatus()) {
+		if (!self.ensurePayments()) {
 			self.sendPaymentsNotInitStatus(req_id);
 			return;
 		}
@@ -1789,7 +1906,7 @@ function YaGamesGMS_Payments_GetPurchases() {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getPaymentsInitStatus()) {
+		if (!self.ensurePayments()) {
 			self.sendPaymentsNotInitStatus(req_id);
 			return;
 		}
@@ -1814,9 +1931,11 @@ function YaGamesGMS_Payments_GetPurchases() {
 
 /**
  * Getting a catalog of all products
+ * Methods on Product are lost after JSON.stringify — resolve currency icon URLs in JS.
+ * @param currencyImageSize {?string} small | medium | svg (default medium)
  * @returns {Number} Request ID
  */
-function YaGamesGMS_Payments_GetCatalog() {
+function YaGamesGMS_Payments_GetCatalog(currencyImageSize = "medium") {
 	let self = YaGamesGMS;
 	let req_id = self.newRequest();
 	setTimeout(function run() {
@@ -1825,15 +1944,39 @@ function YaGamesGMS_Payments_GetCatalog() {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getPaymentsInitStatus()) {
+		if (!self.ensurePayments()) {
 			self.sendPaymentsNotInitStatus(req_id);
 			return;
 		}
 		try {
+			let _size = currencyImageSize || "medium";
 			self._payments.getCatalog()
 				.then((products) => {
-					self.browserConsoleLog("Get Catalog", req_id, products);
-					self.send(req_id, "getCatalog", products);
+					try {
+						let cleanProducts = [];
+						if (products && products.length) {
+							for (let i = 0; i < products.length; i++) {
+								let product = JSON.parse(JSON.stringify(products[i]));
+								if (typeof products[i].getPriceCurrencyImage === "function") {
+									try {
+										let imageUrl = products[i].getPriceCurrencyImage(_size);
+										product.priceCurrencyImage = imageUrl && imageUrl.startsWith('//') 
+											? window.location.protocol + imageUrl : imageUrl;
+									} catch (e) {
+										product.priceCurrencyImage = "";
+									}
+								}
+								cleanProducts.push(product);
+							}
+						}
+						self.browserConsoleLog("Get Catalog", req_id, cleanProducts);
+						self.send(req_id, "getCatalog", cleanProducts);
+					} catch (err) {
+						self.browserConsoleLog("Get Catalog", req_id, products);
+						self.send(req_id, "getCatalog", products);
+						self.browserConsoleLog("Get Catalog error", req_id, err);
+						self.sendError(req_id, "getCatalogError", err);
+					}
 				})
 				.catch((err) => {
 					self.browserConsoleLog("Get Catalog error", req_id, err);
@@ -1862,7 +2005,7 @@ function YaGamesGMS_Payments_ConsumePurchase(purchase_token) {
 			self.sendSdkNotInitStatus(req_id);
 			return;
 		}
-		if (!self.getPaymentsInitStatus()) {
+		if (!self.ensurePayments()) {
 			self.sendPaymentsNotInitStatus(req_id);
 			return;
 		}
@@ -1968,8 +2111,8 @@ function YaGamesGMS_Event_Dispatch(event_name, detail = null) {
 }
 
 /**
- * Enabling event listening
- * @param event_name {string} Event name
+ * Enabling event listening (ysdk.on; formerly onEvent)
+ * @param event_name {string} Event name (EXIT, HISTORY_BACK, ACCOUNT_SELECTION_DIALOG_*)
  * @returns {number} Request ID
  */
 function YaGamesGMS_Event_On(event_name) {
@@ -1982,12 +2125,273 @@ function YaGamesGMS_Event_On(event_name) {
 			return;
 		}
 		try {
-			self._ysdk.onEvent(self._ysdk.EVENTS[event_name], () => {
-				self.browserConsoleLog("onEvent", req_id, event_name);
-				self.send(req_id, "onEvent", event_name);
-			});
+			let _name = String(event_name);
+			let _eventKey = self._ysdk.EVENTS[_name];
+			if (!_eventKey) {
+				self.sendError(req_id, "RuntimeError", { message: "Unknown event: " + _name });
+				return;
+			}
+			if (self._eventHandlers[_name]) {
+				self.browserConsoleLog("Event already subscribed", req_id, _name);
+				return;
+			}
+			let handler = () => {
+				self.browserConsoleLog("onEvent", req_id, _name);
+				self.send(req_id, "onEvent", _name);
+			};
+			self._eventHandlers[_name] = handler;
+			self._ysdk.on(_eventKey, handler);
+			self.browserConsoleLog("Event subscribed", req_id, _name);
 		} catch (err) {
 			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Disable event listening
+ * @param event_name {string} Event name
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_Event_Off(event_name) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Off Event", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			let _name = String(event_name);
+			let _eventKey = self._ysdk.EVENTS[_name];
+			let handler = self._eventHandlers[_name];
+			if (_eventKey && handler && typeof self._ysdk.off === "function") {
+				self._ysdk.off(_eventKey, handler);
+			}
+			delete self._eventHandlers[_name];
+			self.browserConsoleLog("Event unsubscribed", req_id, _name);
+			self.send(req_id, "offEvent", _name);
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * Check whether an SDK method is available for the current user
+ * @param method_name {string} e.g. leaderboards.setScore, player.getIDsPerGame
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_IsAvailableMethod(method_name) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("IsAvailableMethod", req_id, method_name);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self._ysdk.isAvailableMethod(String(method_name))
+				.then((available) => {
+					self.browserConsoleLog("IsAvailableMethod result", req_id, available);
+					self.send(req_id, "isAvailableMethod", available ? 1 : 0);
+				})
+				.catch((err) => {
+					self.browserConsoleLog("IsAvailableMethod error", req_id, err);
+					self.sendError(req_id, "isAvailableMethodError", err);
+				});
+		} catch (err) {
+			self.browserConsoleLog("Runtime error", req_id, err);
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * SafeStorage getItem
+ * @param key {string}
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_Storage_GetItem(key) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Storage GetItem", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.ensureStorage(
+				(storage) => {
+					let value = storage.getItem(String(key));
+					self.send(req_id, "storageGetItem", value === null ? "" : String(value));
+				},
+				(err) => {
+					self.sendError(req_id, "storageError", err);
+				}
+			);
+		} catch (err) {
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * SafeStorage setItem
+ * @param key {string}
+ * @param value {string}
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_Storage_SetItem(key, value) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Storage SetItem", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.ensureStorage(
+				(storage) => {
+					storage.setItem(String(key), String(value));
+					self.send(req_id, "storageSetItem");
+				},
+				(err) => {
+					self.sendError(req_id, "storageError", err);
+				}
+			);
+		} catch (err) {
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * SafeStorage removeItem
+ * @param key {string}
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_Storage_RemoveItem(key) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Storage RemoveItem", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.ensureStorage(
+				(storage) => {
+					storage.removeItem(String(key));
+					self.send(req_id, "storageRemoveItem");
+				},
+				(err) => {
+					self.sendError(req_id, "storageError", err);
+				}
+			);
+		} catch (err) {
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * SafeStorage clear
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_Storage_Clear() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Storage Clear", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.ensureStorage(
+				(storage) => {
+					storage.clear();
+					self.send(req_id, "storageClear");
+				},
+				(err) => {
+					self.sendError(req_id, "storageError", err);
+				}
+			);
+		} catch (err) {
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * SafeStorage key(index)
+ * @param index {number}
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_Storage_Key(index) {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Storage Key", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.ensureStorage(
+				(storage) => {
+					let k = storage.key(Number(index));
+					self.send(req_id, "storageKey", k === null ? "" : String(k));
+				},
+				(err) => {
+					self.sendError(req_id, "storageError", err);
+				}
+			);
+		} catch (err) {
+			self.sendError(req_id, "RuntimeError", err);
+		}
+	}, 0);
+	return req_id;
+}
+
+/**
+ * SafeStorage length
+ * @returns {number} Request ID
+ */
+function YaGamesGMS_Storage_Length() {
+	let self = YaGamesGMS;
+	let req_id = self.newRequest();
+	setTimeout(function run() {
+		self.browserConsoleLog("Storage Length", req_id);
+		if (!self.getInitStatus()) {
+			self.sendSdkNotInitStatus(req_id);
+			return;
+		}
+		try {
+			self.ensureStorage(
+				(storage) => {
+					self.send(req_id, "storageLength", Number(storage.length) || 0);
+				},
+				(err) => {
+					self.sendError(req_id, "storageError", err);
+				}
+			);
+		} catch (err) {
 			self.sendError(req_id, "RuntimeError", err);
 		}
 	}, 0);
